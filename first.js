@@ -9,6 +9,8 @@ class Graph {
       }
     }
     
+// <------------------------------------------------------Неориентированое ребро взвешенного графа--------------------------------------------------------->
+
     //неориентированное ребро для взвешенного графа
     addUndirectedEdge(vertex1, vertex2, weight = null) {
         if (!this.adjacencyList[vertex1] || !this.adjacencyList[vertex2]) {
@@ -17,18 +19,68 @@ class Graph {
         }
         this.adjacencyList[vertex1].push({ node: vertex2, weight });
         this.adjacencyList[vertex2].push({ node: vertex1, weight });
+    }
+
+    deleteUndirectedEdge(vertex1, vertex2) {
+        // Проверяем существование вершин
+        if (!this.adjacencyList[vertex1]) {
+          console.log(`Вершина ${vertex1} не существует.`);
+          return;
+        }
+        if (!this.adjacencyList[vertex2]) {
+          console.log(`Вершина ${vertex2} не существует.`);
+          return;
+        }
+      
+        // Удаляем vertex2 из списка vertex1
+        this.adjacencyList[vertex1] = this.adjacencyList[vertex1].filter(
+          neighbor => neighbor.node !== vertex2
+        );
+      
+        // Удаляем vertex1 из списка vertex2
+        this.adjacencyList[vertex2] = this.adjacencyList[vertex2].filter(
+          neighbor => neighbor.node !== vertex1
+        );
+      
+        console.log(`Ребро между ${vertex1} и ${vertex2} удалено.`);
       }
-    
-      //ориентированное ребро для взвешенного графа
-      addDirectedEdge(vertex1, vertex2, weight = null) {
+      
+// <------------------------------------------------------------------------------------------------------------------------------------------------------->
+
+// <--------------------------------------------------------Ориентированое ребро взвешенного графа--------------------------------------------------------->
+
+//добавление
+    addDirectedEdge(vertex1, vertex2, weight = null) {
         if (!this.adjacencyList[vertex1]) {
           console.log(`Вершина ${vertex1} не существует.`);
           return;
         }
         this.adjacencyList[vertex1].push({ node: vertex2, weight });
-      }
+    }
       
+    //удаление
+    deleteDirectedEdge(vertex1, vertex2) {
+        // Проверяем существование вершин
+        if (!this.adjacencyList[vertex1]) {
+          console.log(`Вершина ${vertex1} не существует.`);
+          return;
+        }
+        
+        if (!this.adjacencyList[vertex2]) {
+          console.log(`Вершина ${vertex2} не существует.`);
+          return;
+        }
+      
+        // Удаляем ребро из vertex1 в vertex2
+        this.adjacencyList[vertex1] = this.adjacencyList[vertex1].filter(
+          neighbor => neighbor.node !== vertex2
+        );
+        
+        console.log(`Ребро ${vertex1} -> ${vertex2} удалено.`);
+    }
   
+// <------------------------------------------------------------------------------------------------------------------------------------------------------->
+
     // Метод для преобразования списка смежности в список рёбер
     toEdgeList() {
       const edges = [];
@@ -63,19 +115,35 @@ class Graph {
   graph.addVertex("B");
   graph.addVertex("C");
   
-  //неориент ребро. Должно быть четыре ребра (а-б, б-а с весом 5; б-с, с-а с весом 2)
+// <--------------------------------------------------------Ориентированое ребро взвешенного графа--------------------------------------------------------->
+
+//  //Добавление неориент ребро взвешенного графа. Должно быть четыре ребра (а-б, б-а с весом 5; б-с, с-б с весом 2)
 //   graph.addUndirectedEdge("A", "B", 5);
 //   graph.addUndirectedEdge("B", "C", 2);
 
-  //ориент ребро взвешенного графа. Должно быть три ребра 
-    graph.addDirectedEdge("A", "B", 5);
-    graph.addDirectedEdge("B", "C", 2);
-    graph.addDirectedEdge("C", "A", 7);
+//   console.log("Список смежности:"); graph.printGraph();
+//   console.log("Список рёбер:"); console.log(graph.toEdgeList());
 
-  
-  console.log("Список смежности:");
-  graph.printGraph();
-  
-  console.log("Список рёбер:");
-  console.log(graph.toEdgeList());
+//   //Удаление ориент ребро взвешенного графа. Должно быть два ребра (b->c, c->b с ветом 2)
+
+//    graph.deleteUndirectedEdge("A", "B")
+
+    
+//   console.log("Список смежности:"); graph.printGraph();
+//   console.log("Список рёбер:"); console.log(graph.toEdgeList());
+// <------------------------------------------------------Неориентированое ребро взвешенного графа--------------------------------------------------------->
+ 
+//   //Добавление ориент ребро взвешенного графа. Должно быть три ребра 
+//     graph.addDirectedEdge("A", "B", 5);
+//     graph.addDirectedEdge("B", "C", 2);
+//     graph.addDirectedEdge("C", "A", 7);
+
+//     console.log("Список смежности:"); graph.printGraph();
+//     console.log("Список рёбер:"); console.log(graph.toEdgeList());
+
+//   //Удаление ориент ребро взвешенного графа. Должно быть два ребра 
+//     graph.deleteDirectedEdge("A","B");
+    
+//     console.log("Список смежности:"); graph.printGraph();
+//     console.log("Список рёбер после удаления:"); console.log(graph.toEdgeList());
   
