@@ -8,17 +8,26 @@ class Graph {
         this.adjacencyList[vertex] = [];
       }
     }
-  
-    addEdge(vertex1, vertex2, weight = null) {
-      if (!this.adjacencyList[vertex1] || !this.adjacencyList[vertex2]) {
-        console.log("Одна или обе вершины не существуют.");
-        return;
+    
+    //неориентированное ребро для взвешенного графа
+    addUndirectedEdge(vertex1, vertex2, weight = null) {
+        if (!this.adjacencyList[vertex1] || !this.adjacencyList[vertex2]) {
+          console.log("Одна или обе вершины не существуют.");
+          return;
+        }
+        this.adjacencyList[vertex1].push({ node: vertex2, weight });
+        this.adjacencyList[vertex2].push({ node: vertex1, weight });
       }
-  
-      // Добавление для неориентированного графа
-      this.adjacencyList[vertex1].push({ node: vertex2, weight });
-      this.adjacencyList[vertex2].push({ node: vertex1, weight });
-    }
+    
+      //ориентированное ребро для взвешенного графа
+      addDirectedEdge(vertex1, vertex2, weight = null) {
+        if (!this.adjacencyList[vertex1]) {
+          console.log(`Вершина ${vertex1} не существует.`);
+          return;
+        }
+        this.adjacencyList[vertex1].push({ node: vertex2, weight });
+      }
+      
   
     // Метод для преобразования списка смежности в список рёбер
     toEdgeList() {
@@ -54,9 +63,15 @@ class Graph {
   graph.addVertex("B");
   graph.addVertex("C");
   
-  graph.addEdge("A", "B", 5);
-  graph.addEdge("A", "C", 3);
-  graph.addEdge("B", "C", 2);
+  //неориент ребро. Должно быть четыре ребра (а-б, б-а с весом 5; б-с, с-а с весом 2)
+//   graph.addUndirectedEdge("A", "B", 5);
+//   graph.addUndirectedEdge("B", "C", 2);
+
+  //ориент ребро взвешенного графа. Должно быть три ребра 
+    graph.addDirectedEdge("A", "B", 5);
+    graph.addDirectedEdge("B", "C", 2);
+    graph.addDirectedEdge("C", "A", 7);
+
   
   console.log("Список смежности:");
   graph.printGraph();
