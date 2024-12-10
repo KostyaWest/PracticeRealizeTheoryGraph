@@ -199,6 +199,46 @@ class Graph {
       }
     }
   }
+
+// <-----------------------------------------------------------------Конструктор-копия----------------------------------------------------------------------->
+
+  class Graph {
+    constructor() {
+        this.adjacencyList = {};
+    }
+
+    // Конструктор-копия
+    constructorCopy(originalGraph) {
+        this.adjacencyList = JSON.parse(JSON.stringify(originalGraph.adjacencyList));
+    }
+}
+
+// //Пример использования конструктора-копии
+// const originalGraph = new Graph();
+// originalGraph.addVertex("A");
+// originalGraph.addVertex("B");
+// originalGraph.addUndirectedEdge("A", "B", 3);
+
+// console.log("Исходный граф:");
+// originalGraph.printGraph();
+
+// // Создаем копию графа
+// const copiedGraph = new Graph();
+// copiedGraph.constructorCopy(originalGraph);
+
+// // Вносим изменения в копию
+// copiedGraph.addVertex("C");
+// copiedGraph.addUndirectedEdge("B", "C", 2);
+
+// console.log("\nКопия графа после изменений:");
+// copiedGraph.printGraph();
+
+// console.log("\nИсходный граф остаётся неизменным:");
+// originalGraph.printGraph();
+// //
+
+// <------------------------------------------------------------------------------------------------------------------------------------------------------->
+
   
   // Пример использования
   const graph = new Graph();
