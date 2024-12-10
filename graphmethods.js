@@ -52,12 +52,27 @@ class Graph {
     return edges;
   }
 
+  // printGraph() {
+  //   console.log("Список смежности:");
+  //   for (let vertex in this.adjacencyList) {console.log(`${vertex} -> ${this.adjacencyList[vertex].map(n => n.node).join(", ")}`);}
+  // }
+
   printGraph() {
     console.log("Список смежности:");
     for (let vertex in this.adjacencyList) {
         console.log(`${vertex} -> ${this.adjacencyList[vertex].map(n => n.node).join(", ")}`);
     }
-  }
+
+    console.log("\nСписок рёбер:");
+    const edges = this.toEdgeList(); // Используем метод toEdgeList для получения списка рёбер
+    edges.forEach(edge => {
+        if (edge.weight !== undefined) {
+            console.log(`${edge.from} - ${edge.to} (вес: ${edge.weight})`);
+        } else {
+            console.log(`${edge.from} - ${edge.to}`);
+        }
+    });
+}
 
   //определитель типа графа
   determineGraphType() {

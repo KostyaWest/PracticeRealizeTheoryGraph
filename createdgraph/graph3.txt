@@ -3,4 +3,3 @@
   "B": [{ "node": "A", "weight": 5 }],
   "C": [{ "node": "A", "weight": 12 }]
 }
-

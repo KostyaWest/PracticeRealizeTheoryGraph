@@ -31,16 +31,54 @@ function loadGraphFromFile(fileName) {
     });
 }
 
-// Пример использования: загрузка всех файлов из папки createdgraph
-fs.readdir(path.join(__dirname, 'createdgraph'), (err, files) => {
-    if (err) {
-        console.log("Ошибка при чтении директории:", err);
-        return;
-    }
+const saveGraphToFile = (graph, fileName) => {
+    const fs = require('fs');
+    const path = require('path');
 
-    // Загружаем каждый файл, который имеет расширение .txt
-    files.filter(file => file.endsWith('.txt')).forEach(file => {
-        console.log(`Загружаем граф из файла: ${file}`);
-        loadGraphFromFile(file);
-    });
-});
+    const folderPath = path.join(__dirname, 'createdgraph'); // Путь к папке
+    const filePath = path.join(folderPath, fileName);       // Полный путь к файлу
+
+    try {
+        // Преобразуем adjacencyList в JSON-строку с отступами для читаемости
+        const graphData = JSON.stringify(graph.adjacencyList, null, 2);
+
+        // Записываем данные в файл с расширением .txt
+        fs.writeFileSync(filePath, graphData, 'utf8');
+        console.log(`Граф успешно сохранён в файл: ${filePath}`);
+    } catch (error) {
+        console.error(`Ошибка при сохранении графа в файл: ${error.message}`);
+    }
+};
+
+const adjacencyList = {
+    "A": [{ "node": "B", "weight": 5 }, { "node": "C", "weight": 12 }],
+    "B": [{ "node": "A", "weight": 5 }],
+    "C": [{ "node": "A", "weight": 12 }]
+};
+
+// Создаём граф с использованием фабрики
+const myGraph = GraphFactory.createGraphFromData(adjacencyList);
+
+// Сохраняем граф в файл
+saveGraphToFile(myGraph, 'exampleGraph.txt');
+
+// Для проверки выводим граф
+console.log("Граф успешно создан и сохранён");
+console.log("Загрузка и определение созданного графа:");
+loadGraphFromFile('exampleGraph.txt');
+
+
+// // Пример использования: загрузка всех файлов из папки createdgraph
+// fs.readdir(path.join(__dirname, 'createdgraph'), (err, files) => {
+//     if (err) {
+//         console.log("Ошибка при чтении директории:", err);
+//         return;
+//     }
+
+//     // Загружаем каждый файл, который имеет расширение .txt
+//     files.filter(file => file.endsWith('.txt')).forEach(file => {
+//         console.log(`Загружаем граф из файла: ${file}`);
+//         loadGraphFromFile(file);
+//     });
+// });
+
