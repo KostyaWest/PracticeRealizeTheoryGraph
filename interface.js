@@ -140,10 +140,9 @@ function editGraphMenu(graph) {
                 graph.printGraph();
                 editGraphMenu(graph);
                 break;
-            case "6":
-                graph.saveGraph();
-                editGraphMenu(graph);
-                break;
+                case "6":
+                    saveGraph(graph);  // Передаем объект graph в saveGraph
+                    break;
             case "7":
                 console.log("Выход из редактирования графа.");
                 rl.close();
@@ -161,11 +160,11 @@ async function saveGraph(graph) {
             fileName += '.txt';  // Дописываем .txt, если не указано
         }
 
-        // Вызовем loadGraphFromFile с именем файла
-        console.log(`функция savegraph запущена (удалить): ${fileName}`);
-        saveGraphToFile(graph, fileName);// Передаем только имя файла
+        console.log(`функция saveGraph запущена (удалить): ${fileName}`);
 
+        // Используем переданный объект graph
+        saveGraphToFile(graph, fileName); 
 
-        rl.close(); // Закрываем интерфейс после выполнения
+        rl.close();  // Закрываем интерфейс после выполнения
     });
 }
