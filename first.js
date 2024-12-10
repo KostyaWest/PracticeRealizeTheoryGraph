@@ -53,8 +53,9 @@ class Graph {
   }
 
   printGraph() {
+    console.log("Список смежности:");
     for (let vertex in this.adjacencyList) {
-      console.log(`${vertex} -> ${this.adjacencyList[vertex].map(n => n.node).join(", ")}`);
+        console.log(`${vertex} -> ${this.adjacencyList[vertex].map(n => n.node).join(", ")}`);
     }
   }
 }
