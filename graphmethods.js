@@ -1,9 +1,8 @@
 class Graph {
-    constructor() {this.adjacencyList = {};}
-    // Конструктор-копия
-    constructorCopy(originalGraph) {this.adjacencyList = JSON.parse(JSON.stringify(originalGraph.adjacencyList));}
+  constructor() {this.adjacencyList = {};}
   
-// <----------------------------------------------------------------------Общие методы---------------------------------------------------------------------->
+  // Конструктор-копия
+  constructorCopy(originalGraph) {this.adjacencyList = JSON.parse(JSON.stringify(originalGraph.adjacencyList));}
 
   addVertex(vertex) {
       if (!this.adjacencyList[vertex]) {
@@ -31,7 +30,6 @@ class Graph {
     console.log(`Вершина ${vertex} и все её рёбра удалены.`);
   }
 
-  // Метод для преобразования списка смежности в список рёбер
   toEdgeList() {
     const edges = [];
     const visited = new Set(); // Для предотвращения дублирования рёбер
@@ -51,11 +49,6 @@ class Graph {
 
     return edges;
   }
-
-  // printGraph() {
-  //   console.log("Список смежности:");
-  //   for (let vertex in this.adjacencyList) {console.log(`${vertex} -> ${this.adjacencyList[vertex].map(n => n.node).join(", ")}`);}
-  // }
 
   printGraph() {
     console.log("Список смежности:");
@@ -99,15 +92,29 @@ class Graph {
 
 //фабрика графов
 class GraphFactory {
+  // Создание нового пустого графа
+  static createGraph(graphType) {
+      switch (graphType) {
+          case "DirectedWeightedGraph":
+              return new DirectedWeightedGraph();
+          case "DirectedUnweightedGraph":
+              return new DirectedUnweightedGraph();
+          case "UndirectedWeightedGraph":
+              return new UndirectedWeightedGraph();
+          case "UndirectedUnweightedGraph":
+              return new UndirectedUnweightedGraph();
+          default:
+              throw new Error("Неизвестный тип графа!");
+      }
+  }
+
+  // Создание графа из данных
   static createGraphFromData(adjacencyList) {
-      // Создаём временный граф для анализа данных
       const tempGraph = new Graph();
       tempGraph.adjacencyList = adjacencyList;
 
-      // Определяем тип графа
       const graphType = tempGraph.determineGraphType();
 
-      // Создаём экземпляр нужного подкласса
       switch (graphType) {
           case "DirectedWeightedGraph":
               return Object.assign(new DirectedWeightedGraph(), tempGraph);
@@ -122,6 +129,7 @@ class GraphFactory {
       }
   }
 }
+
 
 // <----------------------------------------------------класс для неориентированного невзвешенного графа--------------------------------------------------->
 
@@ -275,28 +283,3 @@ class DirectedWeightedGraph extends Graph {
 
 // Экспортируем нужные классы
 module.exports = { GraphFactory, Graph };
-
-
-// <------------------------------------------------------Неориентированое ребро взвешенного графа--------------------------------------------------------->
- 
-//   //Добавление ориент ребро взвешенного графа. Должно быть три ребра 
-    // graph.addDirectedEdge("A", "B", 5);
-    // graph.addDirectedEdge("B", "C", 2);
-    // graph.addDirectedEdge("C", "A", 7);
-
-    // console.log("Список смежности:"); graph.printGraph();
-    // console.log("Список рёбер:"); console.log(graph.toEdgeList());
-
-//// <------------------------------------------------------------------------------------------------------------------------------------------------------->
-
-//   //Удаление ориент ребро взвешенного графа. Должно быть два ребра 
-//     graph.deleteDirectedEdge("A","B");
-
-//// <------------------------------------------------------------------------------------------------------------------------------------------------------->
-  
-////Удаление узла А. Должно остаться одно ребро
-// graph.deleteVertex("A");
-    
-// console.log("Список смежности:"); graph.printGraph();
-// console.log("Список рёбер после удаления:"); console.log(graph.toEdgeList());
-  
