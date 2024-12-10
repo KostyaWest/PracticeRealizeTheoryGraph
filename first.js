@@ -29,13 +29,83 @@ class Graph {
     delete this.adjacencyList[vertex];
 
     console.log(`Вершина ${vertex} и все её рёбра удалены.`);
-}
+  }
 // <------------------------------------------------------------------------------------------------------------------------------------------------------->
-  
+
+// <------------------------------------------------------Неориентированое ребро невзвешенного графа--------------------------------------------------------->
+
+  addUndirectedEdgeNonWeight(vertex1, vertex2) {
+    if (!this.adjacencyList[vertex1] || !this.adjacencyList[vertex2]) {
+      console.log("Одна или обе вершины не существуют.");
+      return;
+    }
+    this.adjacencyList[vertex1].push({ node: vertex2});
+    this.adjacencyList[vertex2].push({ node: vertex1});
+  }
+
+  deleteUndirectedEdgeNonWeight(vertex1, vertex2) {
+      // Проверяем существование вершин
+      if (!this.adjacencyList[vertex1]) {
+        console.log(`Вершина ${vertex1} не существует.`);
+        return;
+      }
+      if (!this.adjacencyList[vertex2]) {
+        console.log(`Вершина ${vertex2} не существует.`);
+        return;
+      }
+    
+      // Удаляем vertex2 из списка vertex1
+      this.adjacencyList[vertex1] = this.adjacencyList[vertex1].filter(
+        neighbor => neighbor.node !== vertex2
+      );
+    
+      // Удаляем vertex1 из списка vertex2
+      this.adjacencyList[vertex2] = this.adjacencyList[vertex2].filter(
+        neighbor => neighbor.node !== vertex1
+      );
+    
+      console.log(`Ребро между ${vertex1} и ${vertex2} удалено.`);
+  }
+    
+// <------------------------------------------------------------------------------------------------------------------------------------------------------->
+
+// <--------------------------------------------------------Ориентированое ребро невзвешенного графа--------------------------------------------------------->
+
+  addDirectedEdgeNonWeight(vertex1, vertex2) {
+      if (!this.adjacencyList[vertex1]) {
+        console.log(`Вершина ${vertex1} не существует.`);
+        return;
+      }
+      this.adjacencyList[vertex1].push({ node: vertex2});
+  }
+    
+  deleteDirectedEdgeNonWeight(vertex1, vertex2) {
+      // Проверяем существование вершин
+      if (!this.adjacencyList[vertex1]) {
+        console.log(`Вершина ${vertex1} не существует.`);
+        return;
+      }
+      
+      if (!this.adjacencyList[vertex2]) {
+        console.log(`Вершина ${vertex2} не существует.`);
+        return;
+      }
+    
+      // Удаляем ребро из vertex1 в vertex2
+      this.adjacencyList[vertex1] = this.adjacencyList[vertex1].filter(
+        neighbor => neighbor.node !== vertex2
+      );
+      
+      console.log(`Ребро ${vertex1} -> ${vertex2} удалено.`);
+  }
+
+// <------------------------------------------------------------------------------------------------------------------------------------------------------->
+
+
+
 // <------------------------------------------------------Неориентированое ребро взвешенного графа--------------------------------------------------------->
 
-    //неориентированное ребро для взвешенного графа
-    addUndirectedEdge(vertex1, vertex2, weight = null) {
+    addUndirectedEdge(vertex1, vertex2, weight = 1) {
         if (!this.adjacencyList[vertex1] || !this.adjacencyList[vertex2]) {
           console.log("Одна или обе вершины не существуют.");
           return;
@@ -72,16 +142,14 @@ class Graph {
 
 // <--------------------------------------------------------Ориентированое ребро взвешенного графа--------------------------------------------------------->
 
-//добавление
-    addDirectedEdge(vertex1, vertex2, weight = null) {
+    addDirectedEdge(vertex1, vertex2, weight = 1) {
         if (!this.adjacencyList[vertex1]) {
           console.log(`Вершина ${vertex1} не существует.`);
           return;
         }
         this.adjacencyList[vertex1].push({ node: vertex2, weight });
     }
-      
-    //удаление
+    
     deleteDirectedEdge(vertex1, vertex2) {
         // Проверяем существование вершин
         if (!this.adjacencyList[vertex1]) {
@@ -137,8 +205,20 @@ class Graph {
   graph.addVertex("A");
   graph.addVertex("B");
   graph.addVertex("C");
-  // graph.addVertex("D");
+  graph.addVertex("D");
 
+// <--------------------------------------------------------Ориентированое ребро невзвешенного графа--------------------------------------------------------->
+ //Добавление неориент ребро взвешенного графа. Должно быть четыре ребра (а-б, б-а; б-с, с-б)
+
+graph.addUndirectedEdgeNonWeight("A", "B");
+graph.addUndirectedEdgeNonWeight("B", "C");
+
+console.log("Список смежности:"); graph.printGraph();
+console.log("Список рёбер:"); console.log(graph.toEdgeList());
+
+//Удаление ориент ребро взвешенного графа. Должно быть два ребра (b->c, c->b)
+
+graph.deleteUndirectedEdgeNonWeight("C", "B");
   
 // <--------------------------------------------------------Ориентированое ребро взвешенного графа--------------------------------------------------------->
 
@@ -167,12 +247,12 @@ class Graph {
 // <------------------------------------------------------Неориентированое ребро взвешенного графа--------------------------------------------------------->
  
 //   //Добавление ориент ребро взвешенного графа. Должно быть три ребра 
-    graph.addDirectedEdge("A", "B", 5);
-    graph.addDirectedEdge("B", "C", 2);
-    graph.addDirectedEdge("C", "A", 7);
+    // graph.addDirectedEdge("A", "B", 5);
+    // graph.addDirectedEdge("B", "C", 2);
+    // graph.addDirectedEdge("C", "A", 7);
 
-    console.log("Список смежности:"); graph.printGraph();
-    console.log("Список рёбер:"); console.log(graph.toEdgeList());
+    // console.log("Список смежности:"); graph.printGraph();
+    // console.log("Список рёбер:"); console.log(graph.toEdgeList());
 
 //// <------------------------------------------------------------------------------------------------------------------------------------------------------->
 
@@ -181,9 +261,8 @@ class Graph {
 
 //// <------------------------------------------------------------------------------------------------------------------------------------------------------->
   
-//Удаление узла А. Должно остаться одно ребро
-
-graph.deleteVertex("A");
+////Удаление узла А. Должно остаться одно ребро
+// graph.deleteVertex("A");
     
 console.log("Список смежности:"); graph.printGraph();
 console.log("Список рёбер после удаления:"); console.log(graph.toEdgeList());
