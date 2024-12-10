@@ -58,8 +58,56 @@ class Graph {
         console.log(`${vertex} -> ${this.adjacencyList[vertex].map(n => n.node).join(", ")}`);
     }
   }
+
+  //определитель типа графа
+  determineGraphType() {
+    let isDirected = false;
+    let isWeighted = false;
+
+    // Проходим по всем вершинам и их рёбрам
+    for (let vertex in this.adjacencyList) {
+      for (let edge of this.adjacencyList[vertex]) {
+        // Проверяем на взвешенность
+        if (edge.weight !== undefined) { isWeighted = true; }
+
+        // Проверяем на ориентированность
+        if (!this.adjacencyList[edge.node]?.some(e => e.node === vertex)) { isDirected = true; }
+      }
+    }
+    // Возвращаем тип графа
+    if (isDirected && isWeighted) return "DirectedWeightedGraph";
+    if (isDirected && !isWeighted) return "DirectedUnweightedGraph";
+    if (!isDirected && isWeighted) return "UndirectedWeightedGraph";
+    if (!isDirected && !isWeighted) return "UndirectedUnweightedGraph";
+  }
 }
-  
+
+//фабрика графов
+class GraphFactory {
+  static createGraphFromData(adjacencyList) {
+      // Создаём временный граф для анализа данных
+      const tempGraph = new Graph();
+      tempGraph.adjacencyList = adjacencyList;
+
+      // Определяем тип графа
+      const graphType = tempGraph.determineGraphType();
+
+      // Создаём экземпляр нужного подкласса
+      switch (graphType) {
+          case "DirectedWeightedGraph":
+              return Object.assign(new DirectedWeightedGraph(), tempGraph);
+          case "DirectedUnweightedGraph":
+              return Object.assign(new DirectedUnweightedGraph(), tempGraph);
+          case "UndirectedWeightedGraph":
+              return Object.assign(new UndirectedWeightedGraph(), tempGraph);
+          case "UndirectedUnweightedGraph":
+              return Object.assign(new UndirectedUnweightedGraph(), tempGraph);
+          default:
+              throw new Error("Неизвестный тип графа!");
+      }
+  }
+}
+
 // <----------------------------------------------------класс для неориентированного невзвешенного графа--------------------------------------------------->
 
 class UndirectedUnweightedGraph extends Graph {
