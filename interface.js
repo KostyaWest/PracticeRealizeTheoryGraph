@@ -12,47 +12,61 @@ const rl = readline.createInterface({
 
 
 // Приветствие и интерфейс выбора
-console.log("Привет!");
-console.log("Вы хотите загрузить существующий граф из файла или создать новый?");
-console.log("1. Загрузить существующий граф из файла");
-console.log("2. Работать в новом");
-console.log("3. Завершить программу");
+function showMainMenu() {
+    console.log("Привет!");
+    console.log("Вы хотите загрузить существующий граф из файла или создать новый?");
+    console.log("1. Загрузить существующий граф из файла");
+    console.log("2. Работать в новом");
+    console.log("3. Завершиить программу");
 
-rl.question('Выберите опцию (1/2/3): ', (choice) => {
-    switch (choice) {
-        case '1':
-            loadGraph(); // Загружаем граф из файла
-            break;
-        case '2':
-            console.log("Работаем с новым графом...");
-            createNewGraph()
-            break;
-        case '3':
-            console.log("Завершаем программу...");
-            rl.close();
-            break;
-        default:
-            console.log("Неверный выбор.");
-            rl.close();
-            break;
-    }
-});
+    rl.question('Выберите опцию (1/2/3): ', (choice) => {
+        switch (choice) {
+            case '1':
+                loadGraph(); // Загружаем граф из файла
+                break;
+            case '2':
+                console.log("Работаем с новым графом...");
+                createNewGraph();
+                break;
+            case '3':
+                console.log("Завершаем программу...");
+                rl.close();
+                break;
+            default:
+                console.log("Неверный выбор.");
+                // Просто повторяем запрос
+                showMainMenu();
+                break;
+        }
+    });
+}
+
+function startApp() {
+    showMainMenu();  // Просто вызываем main menu один раз
+}
+
+startApp();  // Начинаем приложение
 
 // Функция для выбора и загрузки графа
 async function loadGraph() {
-    rl.question('Введите название файла: ', (fileName) => {
+    rl.question('Введите название файла: ', async (fileName) => {
         if (!fileName.endsWith('.txt')) {
-            fileName += '.txt';  // Дописываем .txt, если не указано
+            fileName += '.txt'; // Добавляем расширение .txt, если его нет
         }
 
-        // Вызовем loadGraphFromFile с именем файла
-        console.log(`функция loadgraph запущена (удалить): ${fileName}`);
-        loadGraphFromFile(fileName);  // Передаем только имя файла
+        try {
+            console.log(`Загрузка графа из файла: ${fileName}`);
+            const graph = await loadGraphFromFile(fileName); // Ждём выполнения функции
 
-
-        rl.close(); // Закрываем интерфейс после выполнения
+            console.log('Граф успешно загружен!');
+            editGraphMenu(graph); // Открываем меню редактирования
+        } catch (error) {
+            console.error(error.message); // Выводим сообщение об ошибке
+            showMainMenu(); // Возвращаемся в главное меню
+        }
     });
 }
+
 
 function createNewGraph() {
     console.log("Выберите тип графа, который хотите создать:");
@@ -88,6 +102,17 @@ function createNewGraph() {
 }
 
 function editGraphMenu(graph) {
+    
+    const graphTypeMap = {
+        "UndirectedUnweightedGraph": "Неориентированный невзвешенный граф",
+        "UndirectedWeightedGraph": "Неориентированный взвешенный граф",
+        "DirectedUnweightedGraph": "Ориентированный невзвешенный граф",
+        "DirectedWeightedGraph": "Ориентированный взвешенный граф"
+    };
+    
+    const graphType = graphTypeMap[graph.constructor.name] || "Неизвестный тип графа";
+    
+    console.log(`\nТекущий граф: ${graphType}`);
     console.log("Выберите действие с графом:");
     console.log("1. Добавить вершину");
     console.log("2. Удалить вершину");
@@ -98,9 +123,13 @@ function editGraphMenu(graph) {
     } else if (graph.constructor.name === "UndirectedWeightedGraph") {
         console.log("3. Добавить неориентированное взвешенное ребро");
         console.log("4. Удалить неориентированное взвешенное ребро");
+    }else if (graph.constructor.name === "DirectedUnweightedGraph") {
+        console.log("3. Добавить ориентированное невзвешенное ребро");
+        console.log("4. Удалить ориентированное невзвешенное ребро");
+    }else if (graph.constructor.name === "DirectedWeightedGraph") {
+        console.log("3. Добавить ориентированное взвешенное ребро");
+        console.log("4. Удалить ориентированное взвешенное ребро");
     }
-    // Добавить проверки для других типов графов
-
     console.log("5. Печать графа");
     console.log("6. Сохранить граф в файл");
     console.log("7. Завершить редактирование");
@@ -109,8 +138,12 @@ function editGraphMenu(graph) {
         switch (choice) {
             case "1":
                 rl.question("Введите имя вершины: ", (vertex) => {
-                    graph.addVertex(vertex);
-                    console.log(`Вершина ${vertex} добавлена.`);
+                    try {
+                        graph.addVertex(vertex);
+                        console.log(`Вершина "${vertex}" успешно добавлена.`);
+                    } catch (error) {
+                        console.error(error.message);
+                    }
                     editGraphMenu(graph); // Возвращаемся в меню
                 });
                 break;
@@ -134,7 +167,48 @@ function editGraphMenu(graph) {
                         graph.addUndirectedEdge(v1, v2, parseFloat(weight));
                         editGraphMenu(graph);
                     });
+                } else if (graph.constructor.name === "DirectedUnweightedGraph") {
+                    rl.question("Введите вершины и вес через пробел (v1 v2 вес): ", (input) => {
+                        const [v1, v2] = input.split(" ");
+                        graph.addDirectedEdgeNonWeight(v1, v2);
+                        editGraphMenu(graph);
+                    });
+                } else if (graph.constructor.name === "DirectedWeightedGraph") {
+                    rl.question("Введите вершины и вес через пробел (v1 v2 вес): ", (input) => {
+                        const [v1, v2, weight] = input.split(" ");
+                        graph.addDirectedEdge(v1, v2, parseFloat(weight));
+                        editGraphMenu(graph);
+                    });
                 }
+
+                // 
+                case "4":
+                if (graph.constructor.name === "UndirectedUnweightedGraph") {
+                    rl.question("Введите вершины через пробел (v1 v2): ", (input) => {
+                        const [v1, v2] = input.split(" ");
+                        graph.deleteUndirectedEdgeNonWeight(v1, v2);
+                        editGraphMenu(graph);
+                    });
+                } else if (graph.constructor.name === "UndirectedWeightedGraph") {
+                    rl.question("Введите вершины и вес через пробел (v1 v2 вес): ", (input) => {
+                        const [v1, v2, weight] = input.split(" ");
+                        graph.deleteUndirectedEdge(v1, v2);
+                        editGraphMenu(graph);
+                    });
+                } else if (graph.constructor.name === "DirectedUnweightedGraph") {
+                    rl.question("Введите вершины и вес через пробел (v1 v2 вес): ", (input) => {
+                        const [v1, v2] = input.split(" ");
+                        graph.deleteDirectedEdgeNonWeight(v1, v2);
+                        editGraphMenu(graph);
+                    });
+                } else if (graph.constructor.name === "DirectedWeightedGraph") {
+                    rl.question("Введите вершины и вес через пробел (v1 v2 вес): ", (input) => {
+                        const [v1, v2, weight] = input.split(" ");
+                        graph.deleteDirectedEdge(v1, v2);
+                        editGraphMenu(graph);
+                    });
+                }
+                // 
                 break;
             case "5":
                 graph.printGraph();
@@ -156,15 +230,9 @@ function editGraphMenu(graph) {
 
 async function saveGraph(graph) {
     rl.question('Введите название файла: ', (fileName) => {
-        if (!fileName.endsWith('.txt')) {
-            fileName += '.txt';  // Дописываем .txt, если не указано
-        }
-
-        console.log(`функция saveGraph запущена (удалить): ${fileName}`);
-
-        // Используем переданный объект graph
+        if (!fileName.endsWith('.txt')) { fileName += '.txt'; }
+        console.log(`функция saveGraph запущена (удалить): ${fileName}`); 
         saveGraphToFile(graph, fileName); 
-
-        rl.close();  // Закрываем интерфейс после выполнения
+        rl.close();
     });
 }

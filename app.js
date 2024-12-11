@@ -2,32 +2,67 @@ const fs = require('fs');
 const path = require('path');
 const { GraphFactory, Graph } = require('./graphmethods');
 
+function validateAdjacencyList(adjacencyList) {
+    // Проверяем, что adjacencyList - это объект
+    if (typeof adjacencyList !== 'object' || adjacencyList === null) {
+        console.error("Ошибка: Список смежности должен быть объектом.");
+        return false;
+    }
+
+    // Проверяем каждый узел графа
+    for (const vertex in adjacencyList) {
+        // Убедимся, что узлы являются строками
+        if (typeof vertex !== 'string') {
+            console.error(`Ошибка: Узел "${vertex}" не является строкой.`);
+            return false;
+        }
+
+        const neighbors = adjacencyList[vertex];
+
+        // Проверяем, что список соседей - это массив
+        if (!Array.isArray(neighbors)) {
+            console.error(`Ошибка: Список соседей для узла "${vertex}" должен быть массивом.`);
+            return false;
+        }
+
+        // Проверяем каждый соседний узел
+        for (const neighbor of neighbors) {
+            if (typeof neighbor !== 'object' || !neighbor.node || typeof neighbor.node !== 'string') {
+                console.error(`Ошибка: Сосед узла "${vertex}" имеет некорректный формат:`, neighbor);
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
 // Функция для загрузки графа из текстового файла
 function loadGraphFromFile(fileName) {
     const filePath = path.join(__dirname, 'createdgraph', fileName);
 
-    // Проверяем, существует ли файл
-    if (!fs.existsSync(filePath)) {
-        console.log(`Файл ${fileName} не существует.`);
-        return;
-    }
-
-    // Читаем содержимое файла
-    fs.readFile(filePath, 'utf8', (err, fileContent) => {
-        if (err) {
-            console.log('Ошибка при чтении файла:', err);
-            return;
+    return new Promise((resolve, reject) => {
+        // Проверяем, существует ли файл
+        if (!fs.existsSync(filePath)) {
+            return reject(new Error(`Файл ${fileName} не существует.`));
         }
 
-        try {
-            const adjacencyList = JSON.parse(fileContent);
-            const graph = GraphFactory.createGraphFromData(adjacencyList);
+        // Читаем файл
+        fs.readFile(filePath, 'utf8', (err, fileContent) => {
+            if (err) {
+                return reject(new Error('Ошибка при чтении файла.'));
+            }
 
-            console.log(`Тип графа: ${graph.constructor.name}`);
-            graph.printGraph();
-        } catch (error) {
-            console.error("Ошибка при загрузке графа:", error.message);
-        }
+            try {
+                const adjacencyList = JSON.parse(fileContent);
+                // Добавляем валидацию данных
+                if (!validateAdjacencyList(adjacencyList)) { return reject(new Error('Ошибка: Некорректный формат данных в файле.'));  }
+                const graph = GraphFactory.createGraphFromData(adjacencyList);
+                resolve(graph); // Успешно возвращаем загруженный граф
+            } catch (error) {
+                reject(new Error(`Ошибка при загрузке графа: ${error.message}`));
+            }
+        });
     });
 }
 
@@ -49,22 +84,5 @@ const saveGraphToFile = (graph, fileName) => {
         console.error(`Ошибка при сохранении графа в файл: ${error.message}`);
     }
 };
-
-// const adjacencyList = {
-//     "A": [{ "node": "B", "weight": 5 }, { "node": "C", "weight": 12 }],
-//     "B": [{ "node": "A", "weight": 5 }],
-//     "C": [{ "node": "A", "weight": 12 }]
-// };
-
-// // Создаём граф с использованием фабрики
-// const myGraph = GraphFactory.createGraphFromData(adjacencyList);
-
-// // Сохраняем граф в файл
-// saveGraphToFile(myGraph, 'exampleGraph.txt');
-
-// // Для проверки выводим граф
-// console.log("Граф успешно создан и сохранён");
-// console.log("Загрузка и определение созданного графа:");
-// loadGraphFromFile('exampleGraph.txt');
 
 module.exports = { saveGraphToFile, loadGraphFromFile };

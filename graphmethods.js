@@ -5,10 +5,11 @@ class Graph {
   constructorCopy(originalGraph) {this.adjacencyList = JSON.parse(JSON.stringify(originalGraph.adjacencyList));}
 
   addVertex(vertex) {
-      if (!this.adjacencyList[vertex]) {
-        this.adjacencyList[vertex] = [];
-      }
-  }
+    if (this.adjacencyList[vertex]) { 
+        throw new Error(`Вершина "${vertex}" уже существует!`);
+    }
+    this.adjacencyList[vertex] = [];
+}
     
   deleteVertex(vertex) {
     // Проверяем, существует ли вершина
@@ -137,6 +138,9 @@ class UndirectedUnweightedGraph extends Graph {
   constructor() { super(); }
 
   addUndirectedEdgeNonWeight(vertex1, vertex2) {
+    if (typeof vertex1 !== "string" || typeof vertex2 !== "string") {
+      throw new Error("Оба узла должны быть строками!");
+    }
     if (!this.adjacencyList[vertex1] || !this.adjacencyList[vertex2]) {
       console.log("Одна или обе вершины не существуют.");
       return;
