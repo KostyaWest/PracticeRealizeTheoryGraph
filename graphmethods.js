@@ -53,20 +53,15 @@ class Graph {
 
   printGraph() {
     console.log("Список смежности:");
-    for (let vertex in this.adjacencyList) {
-        console.log(`${vertex} -> ${this.adjacencyList[vertex].map(n => n.node).join(", ")}`);
-    }
+    for (let vertex in this.adjacencyList) { console.log(`${vertex} -> ${this.adjacencyList[vertex].map(n => n.node).join(", ")}`); }
 
     console.log("\nСписок рёбер:");
     const edges = this.toEdgeList(); // Используем метод toEdgeList для получения списка рёбер
     edges.forEach(edge => {
-        if (edge.weight !== undefined) {
-            console.log(`${edge.from} - ${edge.to} (вес: ${edge.weight})`);
-        } else {
-            console.log(`${edge.from} - ${edge.to}`);
-        }
-    });
-}
+        if (edge.weight !== undefined) { console.log(`${edge.from} - ${edge.to} (вес: ${edge.weight})`); } 
+        else { console.log(`${edge.from} - ${edge.to}`);}
+     });
+  }
 
   //определитель типа графа
   determineGraphType() {
@@ -88,6 +83,27 @@ class Graph {
     if (isDirected && !isWeighted) return "DirectedUnweightedGraph";
     if (!isDirected && isWeighted) return "UndirectedWeightedGraph";
     if (!isDirected && !isWeighted) return "UndirectedUnweightedGraph";
+  }
+
+  // Функция для поиска вершин, у которых полустепень исхода больше полустепени захода
+  findVerticesWithHigherOutDegree() {
+    const result = [];
+    for (const vertex in this.adjacencyList) {
+        const outDegree = this.adjacencyList[vertex]?.length || 0;
+        
+        let inDegree = 0;
+        // Проходим по всем вершинам и считаем количество входящих рёбер
+        for (const v in this.adjacencyList) {
+            inDegree += this.adjacencyList[v].filter(edge => edge.node === vertex).length;
+        }
+
+        console.log(`Вершина: ${vertex}, Исходящие рёбра: ${outDegree}, Входящие рёбра: ${inDegree}`);
+        
+        if (outDegree > inDegree) {
+            result.push(vertex);
+        }
+    }
+    return result;
   }
 }
 

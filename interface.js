@@ -132,7 +132,8 @@ function editGraphMenu(graph) {
     }
     console.log("5. Печать графа");
     console.log("6. Сохранить граф в файл");
-    console.log("7. Завершить редактирование");
+    console.log("7. Задание 2, номер 8. Вывести те вершины, у которых полустепень исхода больше полустепени захода. Только для ориентированых");
+    console.log("8. Завершить редактирование");
 
     rl.question("Выберите действие: ", (choice) => {
         switch (choice) {
@@ -214,10 +215,14 @@ function editGraphMenu(graph) {
                 graph.printGraph();
                 editGraphMenu(graph);
                 break;
-                case "6":
-                    saveGraph(graph);  // Передаем объект graph в saveGraph
-                    break;
+            case "6":
+                saveGraph(graph);  // Передаем объект graph в saveGraph
+                break;
             case "7":
+                    const vertices = graph.findVerticesWithHigherOutDegree();
+                    if (vertices.length) { console.log("Вершины с полустепенью исхода больше полустепени захода:", vertices.join(", "));} 
+                    else { console.log("Таких вершин нет."); }
+            case "8":
                 console.log("Выход из редактирования графа.");
                 rl.close();
                 break;
