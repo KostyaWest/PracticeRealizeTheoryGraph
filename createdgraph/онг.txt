@@ -1,0 +1,11 @@
+{
+  "A": [{ "node": "B" }, { "node": "C" }, { "node": "F" }, { "node": "H" }],
+  "B": [{ "node": "C" }, { "node": "D" }, { "node": "F" }, { "node": "H" }],
+  "C": [{ "node": "A" }, { "node": "G" }, { "node": "I" }],
+  "D": [{ "node": "D" }, { "node": "G" }],
+  "E": [{ "node": "H" }],
+  "F": [{ "node": "G" }, { "node": "I" }],
+  "G": [],
+  "H": [{ "node": "I" }],
+  "I": []
+}
