@@ -141,8 +141,26 @@ class UndirectedUnweightedGraph extends Graph {
     if (typeof vertex1 !== "string" || typeof vertex2 !== "string") {
       throw new Error("Оба узла должны быть строками!");
     }
-    if (!this.adjacencyList[vertex1] || !this.adjacencyList[vertex2]) {
-      console.log("Одна или обе вершины не существуют.");
+    if (!this.adjacencyList[vertex1]) {
+      console.log(`Вершина ${vertex1} не существует.`);
+      return;
+    }
+
+    // Проверка на существование вершины vertex2
+    if (!this.adjacencyList[vertex2]) {
+      console.log(`Вершина ${vertex2} не существует.`);
+      return;
+    }
+
+    // Проверка на существование ребра между vertex1 и vertex2 (для предотвращения мультиграфа)
+    const existingEdge = this.adjacencyList[vertex1].find(
+      (neighbor) => neighbor.node === vertex2
+    );
+
+    if (existingEdge) {
+      console.log(
+        `Ошибка: Ребро из ${vertex1} в ${vertex2} уже существует. Запрещено создание мультиграфа.`
+      );
       return;
     }
     this.adjacencyList[vertex1].push({ node: vertex2});
@@ -181,10 +199,32 @@ class UndirectedWeightedGraph extends Graph {
   constructor() { super(); }
 
   addUndirectedEdge(vertex1, vertex2, weight = 1) {
-    if (!this.adjacencyList[vertex1] || !this.adjacencyList[vertex2]) {
-      console.log("Одна или обе вершины не существуют.");
+    if (typeof vertex1 !== "string" || typeof vertex2 !== "string") {
+      throw new Error("Оба узла должны быть строками!");
+    }
+    if (!this.adjacencyList[vertex1]) {
+      console.log(`Вершина ${vertex1} не существует.`);
       return;
     }
+
+    // Проверка на существование вершины vertex2
+    if (!this.adjacencyList[vertex2]) {
+      console.log(`Вершина ${vertex2} не существует.`);
+      return;
+    }
+
+    // Проверка на существование ребра между vertex1 и vertex2 (для предотвращения мультиграфа)
+    const existingEdge = this.adjacencyList[vertex1].find(
+      (neighbor) => neighbor.node === vertex2
+    );
+
+    if (existingEdge) {
+      console.log(
+        `Ошибка: Ребро из ${vertex1} в ${vertex2} уже существует. Запрещено создание мультиграфа.`
+      );
+      return;
+    }
+
     this.adjacencyList[vertex1].push({ node: vertex2, weight });
     this.adjacencyList[vertex2].push({ node: vertex1, weight });
     console.log(`Неориентированное взвешенное ребро между ${vertex1} и ${vertex2} добавлено.`);
@@ -220,10 +260,32 @@ class DirectedUnweightedGraph extends Graph {
   constructor() { super(); }
 
   addDirectedEdgeNonWeight(vertex1, vertex2) {
+    if (typeof vertex1 !== "string" || typeof vertex2 !== "string") {
+      throw new Error("Оба узла должны быть строками!");
+    }
     if (!this.adjacencyList[vertex1]) {
       console.log(`Вершина ${vertex1} не существует.`);
       return;
     }
+
+    // Проверка на существование вершины vertex2
+    if (!this.adjacencyList[vertex2]) {
+      console.log(`Вершина ${vertex2} не существует.`);
+      return;
+    }
+
+    // Проверка на существование ребра между vertex1 и vertex2 (для предотвращения мультиграфа)
+    const existingEdge = this.adjacencyList[vertex1].find(
+      (neighbor) => neighbor.node === vertex2
+    );
+
+    if (existingEdge) {
+      console.log(
+        `Ошибка: Ребро из ${vertex1} в ${vertex2} уже существует. Запрещено создание мультиграфа.`
+      );
+      return;
+    }
+
     this.adjacencyList[vertex1].push({ node: vertex2});
     console.log(`Ориентированное невзвешенное ребро между ${vertex1} и ${vertex2} добавлено.`);
   }
@@ -254,14 +316,40 @@ class DirectedWeightedGraph extends Graph {
   constructor() { super(); }
 
   addDirectedEdge(vertex1, vertex2, weight = 1) {
+    if (typeof vertex1 !== "string" || typeof vertex2 !== "string") {
+      throw new Error("Оба узла должны быть строками!");
+    }
+    // Проверка на существование вершины vertex1
     if (!this.adjacencyList[vertex1]) {
       console.log(`Вершина ${vertex1} не существует.`);
       return;
     }
-    this.adjacencyList[vertex1].push({ node: vertex2, weight });
-    console.log(`Ориентированное взвешенное ребро между ${vertex1} и ${vertex2} добавлено.`);
-  }
 
+    // Проверка на существование вершины vertex2
+    if (!this.adjacencyList[vertex2]) {
+      console.log(`Вершина ${vertex2} не существует.`);
+      return;
+    }
+
+    // Проверка на существование ребра между vertex1 и vertex2 (для предотвращения мультиграфа)
+    const existingEdge = this.adjacencyList[vertex1].find(
+      (neighbor) => neighbor.node === vertex2
+    );
+
+    if (existingEdge) {
+      console.log(
+        `Ошибка: Ребро из ${vertex1} в ${vertex2} уже существует. Запрещено создание мультиграфа.`
+      );
+      return;
+    }
+
+    // Добавление нового ребра
+    this.adjacencyList[vertex1].push({ node: vertex2, weight });
+    console.log(
+      `Ориентированное взвешенное ребро между ${vertex1} и ${vertex2} добавлено.`
+    );
+  }
+  
   deleteDirectedEdge(vertex1, vertex2) {
     // Проверяем существование вершин
     if (!this.adjacencyList[vertex1]) {

@@ -55,6 +55,17 @@ function loadGraphFromFile(fileName) {
 
             try {
                 const adjacencyList = JSON.parse(fileContent);
+                // Проверка на дублирующиеся рёбра
+                const edgesSet = new Set(); // Множество для отслеживания рёбер
+                for (const vertex in adjacencyList) {
+                    adjacencyList[vertex].forEach(edge => {
+                        const edgeString = `${vertex}-${edge.node}-${edge.weight || ''}`;
+                        if (edgesSet.has(edgeString)) {
+                            throw new Error(`Ошибка: Найдено дублирующееся ребро: ${edgeString}`);
+                        }
+                        edgesSet.add(edgeString);
+                    });
+                }
                 // Добавляем валидацию данных
                 if (!validateAdjacencyList(adjacencyList)) { return reject(new Error('Ошибка: Некорректный формат данных в файле.'));  }
                 const graph = GraphFactory.createGraphFromData(adjacencyList);
