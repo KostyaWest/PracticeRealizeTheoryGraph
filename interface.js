@@ -208,7 +208,7 @@ function editGraphMenu(graph) {
                         editGraphMenu(graph);
                     });
                 } else if (graph.constructor.name === "DirectedUnweightedGraph") {
-                    rl.question("Введите вершины и вес через пробел (v1 v2 вес): ", (input) => {
+                    rl.question("Введите вершины и вес через пробел (v1 v2): ", (input) => {
                         const [v1, v2] = input.split(" ");
                         graph.deleteDirectedEdgeNonWeight(v1, v2);
                         editGraphMenu(graph);
