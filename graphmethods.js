@@ -109,60 +109,71 @@ class Graph {
   calculateVertexDegrees() {
     const graphType = this.determineGraphType(); // Определяем тип графа
     const degrees = {}; // Объект для хранения степеней вершин
-  
+
     // Инициализация степеней вершин
     for (const vertex in this.adjacencyList) {
-      degrees[vertex] = 0;
+        degrees[vertex] = { inDegree: 0, outDegree: 0 }; // Инициализируем объект для каждой вершины
     }
-  
+
     if (graphType.includes("Directed")) {
-      // Для ориентированного графа
-      for (const vertex in this.adjacencyList) {
-        let outDegree = this.adjacencyList[vertex]?.length || 0; // Полустепень исхода
-        let inDegree = 0; // Полустепень захода
-  
-        // Считаем входящие рёбра
-        for (const v in this.adjacencyList) {
-          inDegree += this.adjacencyList[v].filter(edge => edge.node === vertex).length;
+        // Для ориентированного графа
+        for (const vertex in this.adjacencyList) {
+            let outDegree = 0; // Полустепень исхода
+            let inDegree = 0;  // Полустепень захода
+
+            // Подсчёт исходящих рёбер и петель
+            for (const edge of this.adjacencyList[vertex]) {
+                if (edge.node === vertex) {
+                    // Петля добавляется 1 раз в исходящие и 1 раз во входящие
+                    outDegree += 1;
+                    inDegree += 1;
+                } else {
+                    outDegree += 1;
+                }
+            }
+
+            // Подсчёт входящих рёбер
+            for (const v in this.adjacencyList) {
+                if (v !== vertex) {
+                    inDegree += this.adjacencyList[v].filter(edge => edge.node === vertex).length;
+                }
+            }
+
+            // Сохраняем в объект с результатами
+            degrees[vertex] = { inDegree, outDegree };
         }
-  
-        // Петля прибавляет 1 и в исходящие, и во входящие рёбра
-        const loops = this.adjacencyList[vertex].filter(edge => edge.node === vertex).length;
-        outDegree += loops;
-        inDegree += loops;
-  
-        degrees[vertex] = { inDegree, outDegree };
-      }
     } else {
       // Для неориентированного графа
       for (const vertex in this.adjacencyList) {
-        let degree = 0;
-  
-        for (const edge of this.adjacencyList[vertex]) {
-          degree += 1; // Считаем каждое инцидентное ребро
-          if (edge.node === vertex) {
-            degree += 1; // Петля прибавляет 2
+          let degree = 0;
+
+          // Подсчёт рёбер
+          for (const edge of this.adjacencyList[vertex]) {
+              degree += 1; // Каждое рёбро считается как инцидентное
           }
-        }
-  
-        degrees[vertex] = degree / 2; // Делим на 2 для учёта дублирования
+
+          // Сохраняем степень для неориентированного графа
+          degrees[vertex] = degree;
       }
-    }
-  
+    } 
+
     // Выводим результат
     console.log("\nСтепени вершин:");
     for (const vertex in degrees) {
-      if (typeof degrees[vertex] === "object") {
-        console.log(`Вершина: ${vertex}, Входящие: ${degrees[vertex].inDegree}, Исходящие: ${degrees[vertex].outDegree}`);
-      } else {
-        console.log(`Вершина: ${vertex}, Степень: ${degrees[vertex]}`);
-      }
+        if (degrees[vertex].inDegree !== undefined) {
+            // Если это ориентированный граф
+            console.log(`Вершина: ${vertex}, Входящие: ${degrees[vertex].inDegree}, Исходящие: ${degrees[vertex].outDegree}`);
+        } else {
+            // Если это неориентированный граф
+            console.log(`Вершина: ${vertex}, Степень: ${degrees[vertex]}`);
+        }
     }
-  
+
     return degrees; // Возвращаем степени вершин
   }
-  
 }
+          
+
 
 
 

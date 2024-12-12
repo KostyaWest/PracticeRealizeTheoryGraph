@@ -16,6 +16,8 @@ function startApp() {
 
 startApp();  // Начинаем приложение
 
+// ---------------------------------------------------------------------------------------------------------------
+
 function printGraphType(graph) {
     const graphTypeMap = {
         "UndirectedUnweightedGraph": "Неориентированный невзвешенный граф",
@@ -29,6 +31,16 @@ function printGraphType(graph) {
     console.log(`\nТекущий граф: ${graphType}`);
 }
 
+async function saveGraph(graph) {
+    rl.question('Введите название файла: ', (fileName) => {
+        if (!fileName.endsWith('.txt')) { fileName += '.txt'; }
+        saveGraphToFile(graph, fileName); 
+        rl.close();
+    });
+}
+
+
+// ---------------------------------------------------------------------------------------------------------------
 // Приветствие и интерфейс выбора
 function showMainMenu() {
     console.log("Привет!");
@@ -55,6 +67,26 @@ function showMainMenu() {
                 // Просто повторяем запрос
                 showMainMenu();
                 break;
+        }
+    });
+}
+
+// Функция для выбора и загрузки графа
+async function loadGraph() {
+    rl.question('Введите название файла: ', async (fileName) => {
+        if (!fileName.endsWith('.txt')) {
+            fileName += '.txt'; // Добавляем расширение .txt, если его нет
+        }
+
+        try {
+            console.log(`Загрузка графа из файла: ${fileName}`);
+            const graph = await loadGraphFromFile(fileName); // Ждём выполнения функции
+
+            console.log('Граф успешно загружен!');
+            editGraphMenu(graph); // Открываем меню редактирования
+        } catch (error) {
+            console.error(error.message); // Выводим сообщение об ошибке
+            showMainMenu(); // Возвращаемся в главное меню
         }
     });
 }
@@ -93,16 +125,7 @@ function createNewGraph() {
 }
 
 function editGraphMenu(graph) {
-    const graphTypeMap = {
-        "UndirectedUnweightedGraph": "Неориентированный невзвешенный граф",
-        "UndirectedWeightedGraph": "Неориентированный взвешенный граф",
-        "DirectedUnweightedGraph": "Ориентированный невзвешенный граф",
-        "DirectedWeightedGraph": "Ориентированный взвешенный граф"
-    };
-    
-    const graphType = graphTypeMap[graph.constructor.name] || "Неизвестный тип графа";
-    
-    console.log(`\nТекущий граф: ${graphType}`);
+    printGraphType(graph);
     console.log("Выберите действие с графом:");
     console.log("1. Добавить вершину");
     console.log("2. Удалить вершину");
@@ -222,8 +245,7 @@ function editGraphMenu(graph) {
 }
 
 function zadaniya(graph) {
-    const graphType = graphTypeMap[graph.constructor.name] || "Неизвестный тип графа";
-    console.log(`\nТекущий граф: ${graphType}`);
+    printGraphType(graph);
     console.log("Выберите действие с графом:");
     console.log("1. Задание 2, номер 8. Вывести те вершины, у которых полустепень исхода больше полустепени захода. Только для ориентированых графов");
     console.log("2. Задание 3 номер номер 3. Для каждой вершины графа вывести её степень. Любой граф");
@@ -266,30 +288,4 @@ function zadaniya(graph) {
     });
 }
 
-async function saveGraph(graph) {
-    rl.question('Введите название файла: ', (fileName) => {
-        if (!fileName.endsWith('.txt')) { fileName += '.txt'; }
-        saveGraphToFile(graph, fileName); 
-        rl.close();
-    });
-}
 
-// Функция для выбора и загрузки графа
-async function loadGraph() {
-    rl.question('Введите название файла: ', async (fileName) => {
-        if (!fileName.endsWith('.txt')) {
-            fileName += '.txt'; // Добавляем расширение .txt, если его нет
-        }
-
-        try {
-            console.log(`Загрузка графа из файла: ${fileName}`);
-            const graph = await loadGraphFromFile(fileName); // Ждём выполнения функции
-
-            console.log('Граф успешно загружен!');
-            editGraphMenu(graph); // Открываем меню редактирования
-        } catch (error) {
-            console.error(error.message); // Выводим сообщение об ошибке
-            showMainMenu(); // Возвращаемся в главное меню
-        }
-    });
-}

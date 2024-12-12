@@ -1,13 +1,140 @@
 {
-  "A": [{ "node": "B", "weight": 3 }, { "node": "C", "weight": 6 }, { "node": "D", "weight": 7 }],
-  "B": [{ "node": "A", "weight": 3 }, { "node": "C", "weight": 4 }, { "node": "E", "weight": 5 }],
-  "C": [{ "node": "A", "weight": 6 }, { "node": "B", "weight": 4 }, { "node": "C", "weight": 2 }, { "node": "F", "weight": 8 }],
-  "D": [{ "node": "E", "weight": 1 }, { "node": "F", "weight": 2 }, { "node": "A", "weight": 7 }],
-  "E": [{ "node": "D", "weight": 1 }, { "node": "B", "weight": 5 }, { "node": "F", "weight": 4 }],
-  "F": [{ "node": "C", "weight": 8 }, { "node": "D", "weight": 2 }, { "node": "E", "weight": 4 }, { "node": "G", "weight": 3 }],
-  "G": [{ "node": "F", "weight": 3 }, { "node": "H", "weight": 9 }],
-  "H": [{ "node": "G", "weight": 9 }, { "node": "I", "weight": 2 }],
-  "I": [{ "node": "H", "weight": 2 }, { "node": "J", "weight": 4 }],
-  "J": [{ "node": "I", "weight": 2 }, { "node": "K", "weight": 7 }],
-  "K": [{ "node": "J", "weight": 7 }]
+  "A": [
+    {
+      "node": "B",
+      "weight": 3
+    },
+    {
+      "node": "C",
+      "weight": 6
+    },
+    {
+      "node": "D",
+      "weight": 7
+    }
+  ],
+  "B": [
+    {
+      "node": "A",
+      "weight": 3
+    },
+    {
+      "node": "C",
+      "weight": 4
+    },
+    {
+      "node": "E",
+      "weight": 5
+    }
+  ],
+  "C": [
+    {
+      "node": "A",
+      "weight": 6
+    },
+    {
+      "node": "B",
+      "weight": 4
+    },
+    {
+      "node": "C",
+      "weight": 2
+    },
+    {
+      "node": "F",
+      "weight": 8
+    }
+  ],
+  "D": [
+    {
+      "node": "E",
+      "weight": 1
+    },
+    {
+      "node": "F",
+      "weight": 2
+    },
+    {
+      "node": "A",
+      "weight": 7
+    }
+  ],
+  "E": [
+    {
+      "node": "D",
+      "weight": 1
+    },
+    {
+      "node": "B",
+      "weight": 5
+    },
+    {
+      "node": "F",
+      "weight": 4
+    }
+  ],
+  "F": [
+    {
+      "node": "C",
+      "weight": 8
+    },
+    {
+      "node": "D",
+      "weight": 2
+    },
+    {
+      "node": "E",
+      "weight": 4
+    },
+    {
+      "node": "G",
+      "weight": 3
+    }
+  ],
+  "G": [
+    {
+      "node": "F",
+      "weight": 3
+    },
+    {
+      "node": "H",
+      "weight": 9
+    }
+  ],
+  "H": [
+    {
+      "node": "G",
+      "weight": 9
+    },
+    {
+      "node": "I",
+      "weight": 2
+    }
+  ],
+  "I": [
+    {
+      "node": "H",
+      "weight": 2
+    },
+    {
+      "node": "J",
+      "weight": 4
+    }
+  ],
+  "J": [
+    {
+      "node": "I",
+      "weight": 2
+    },
+    {
+      "node": "K",
+      "weight": 7
+    }
+  ],
+  "K": [
+    {
+      "node": "J",
+      "weight": 7
+    }
+  ]
 }
