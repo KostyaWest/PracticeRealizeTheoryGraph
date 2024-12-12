@@ -47,27 +47,6 @@ function startApp() {
 
 startApp();  // Начинаем приложение
 
-// Функция для выбора и загрузки графа
-async function loadGraph() {
-    rl.question('Введите название файла: ', async (fileName) => {
-        if (!fileName.endsWith('.txt')) {
-            fileName += '.txt'; // Добавляем расширение .txt, если его нет
-        }
-
-        try {
-            console.log(`Загрузка графа из файла: ${fileName}`);
-            const graph = await loadGraphFromFile(fileName); // Ждём выполнения функции
-
-            console.log('Граф успешно загружен!');
-            editGraphMenu(graph); // Открываем меню редактирования
-        } catch (error) {
-            console.error(error.message); // Выводим сообщение об ошибке
-            showMainMenu(); // Возвращаемся в главное меню
-        }
-    });
-}
-
-
 function createNewGraph() {
     console.log("Выберите тип графа, который хотите создать:");
     console.log("1. Ориентированный взвешенный граф");
@@ -209,27 +188,36 @@ function editGraphMenu(graph) {
                         editGraphMenu(graph);
                     });
                 }
-                // 
                 break;
-            case "5":
-                graph.printGraph();
-                editGraphMenu(graph);
-                break;
-            case "6":
-                saveGraph(graph);  // Передаем объект graph в saveGraph
-                break;
-            case "7":
-                    const vertices = graph.findVerticesWithHigherOutDegree();
-                    if (vertices.length) { console.log("Вершины с полустепенью исхода больше полустепени захода:", vertices.join(", "));} 
-                    else { console.log("Таких вершин нет."); }
-            case "8":
-                console.log("Выход из редактирования графа.");
-                rl.close();
-                break;
-            default:
-                console.log("Неверный выбор.");
-                editGraphMenu(graph);
-        }
+                case "5":
+                    graph.printGraph();
+                    editGraphMenu(graph);
+                    break;
+                case "6":
+                    saveGraph(graph);
+                    break;
+                case "7":
+                        if ((graph.constructor.name === "DirectedUnweightedGraph") || (graph.constructor.name === "DirectedWeightedGraph")) {
+                            const vertices = graph.findVerticesWithHigherOutDegree();
+                            console.log();
+                            if (vertices.length) { console.log("Вершины с полустепенью исхода больше полустепени захода:", vertices.join(", "));} 
+                            else { console.log("Таких вершин нет."); }
+                            editGraphMenu(graph); 
+                        } 
+                        else if ((graph.constructor.name === "UndirectedUnweightedGraph") || (graph.constructor.name === "UndirectedWeightedGraph")) {
+                            console.log();
+                            console.log("Поскольку в ориентированном графе у ребер нет направления, высчитывание полустепени - неккорретный запрос.");
+                            editGraphMenu(graph);
+                        }
+                        break;
+                case "8":
+                    console.log("Выход из редактирования графа.");
+                    rl.close();
+                    break;
+                default:
+                    console.log("Неверный выбор.");
+                    editGraphMenu(graph);
+        }  
     });
 }
 
@@ -238,5 +226,25 @@ async function saveGraph(graph) {
         if (!fileName.endsWith('.txt')) { fileName += '.txt'; }
         saveGraphToFile(graph, fileName); 
         rl.close();
+    });
+}
+
+// Функция для выбора и загрузки графа
+async function loadGraph() {
+    rl.question('Введите название файла: ', async (fileName) => {
+        if (!fileName.endsWith('.txt')) {
+            fileName += '.txt'; // Добавляем расширение .txt, если его нет
+        }
+
+        try {
+            console.log(`Загрузка графа из файла: ${fileName}`);
+            const graph = await loadGraphFromFile(fileName); // Ждём выполнения функции
+
+            console.log('Граф успешно загружен!');
+            editGraphMenu(graph); // Открываем меню редактирования
+        } catch (error) {
+            console.error(error.message); // Выводим сообщение об ошибке
+            showMainMenu(); // Возвращаемся в главное меню
+        }
     });
 }
