@@ -10,6 +10,24 @@ const rl = readline.createInterface({
     output: process.stdout
 });
 
+function startApp() {
+    showMainMenu();  // Просто вызываем main menu один раз
+}
+
+startApp();  // Начинаем приложение
+
+function printGraphType(graph) {
+    const graphTypeMap = {
+        "UndirectedUnweightedGraph": "Неориентированный невзвешенный граф",
+        "UndirectedWeightedGraph": "Неориентированный взвешенный граф",
+        "DirectedUnweightedGraph": "Ориентированный невзвешенный граф",
+        "DirectedWeightedGraph": "Ориентированный взвешенный граф"
+    };
+
+    const graphType = graphTypeMap[graph.constructor.name] || "Неизвестный тип графа";
+
+    console.log(`\nТекущий граф: ${graphType}`);
+}
 
 // Приветствие и интерфейс выбора
 function showMainMenu() {
@@ -40,12 +58,6 @@ function showMainMenu() {
         }
     });
 }
-
-function startApp() {
-    showMainMenu();  // Просто вызываем main menu один раз
-}
-
-startApp();  // Начинаем приложение
 
 function createNewGraph() {
     console.log("Выберите тип графа, который хотите создать:");
@@ -81,7 +93,6 @@ function createNewGraph() {
 }
 
 function editGraphMenu(graph) {
-    
     const graphTypeMap = {
         "UndirectedUnweightedGraph": "Неориентированный невзвешенный граф",
         "UndirectedWeightedGraph": "Неориентированный взвешенный граф",
@@ -111,7 +122,7 @@ function editGraphMenu(graph) {
     }
     console.log("5. Печать графа");
     console.log("6. Сохранить граф в файл");
-    console.log("7. Задание 2, номер 8. Вывести те вершины, у которых полустепень исхода больше полустепени захода. Только для ориентированых");
+    console.log("7. Перейти к заданиям");
     console.log("8. Завершить редактирование");
 
     rl.question("Выберите действие: ", (choice) => {
@@ -160,8 +171,6 @@ function editGraphMenu(graph) {
                         editGraphMenu(graph);
                     });
                 }
-
-                // 
                 case "4":
                 if (graph.constructor.name === "UndirectedUnweightedGraph") {
                     rl.question("Введите вершины через пробел (v1 v2): ", (input) => {
@@ -197,19 +206,9 @@ function editGraphMenu(graph) {
                     saveGraph(graph);
                     break;
                 case "7":
-                        if ((graph.constructor.name === "DirectedUnweightedGraph") || (graph.constructor.name === "DirectedWeightedGraph")) {
-                            const vertices = graph.findVerticesWithHigherOutDegree();
-                            console.log();
-                            if (vertices.length) { console.log("Вершины с полустепенью исхода больше полустепени захода:", vertices.join(", "));} 
-                            else { console.log("Таких вершин нет."); }
-                            editGraphMenu(graph); 
-                        } 
-                        else if ((graph.constructor.name === "UndirectedUnweightedGraph") || (graph.constructor.name === "UndirectedWeightedGraph")) {
-                            console.log();
-                            console.log("Поскольку в ориентированном графе у ребер нет направления, высчитывание полустепени - неккорретный запрос.");
-                            editGraphMenu(graph);
-                        }
-                        break;
+                    console.log("Переходим к заданиям...");
+                    zadaniya(graph);
+                    break;
                 case "8":
                     console.log("Выход из редактирования графа.");
                     rl.close();
@@ -217,6 +216,52 @@ function editGraphMenu(graph) {
                 default:
                     console.log("Неверный выбор.");
                     editGraphMenu(graph);
+                    break;
+        }  
+    });
+}
+
+function zadaniya(graph) {
+    const graphType = graphTypeMap[graph.constructor.name] || "Неизвестный тип графа";
+    console.log(`\nТекущий граф: ${graphType}`);
+    console.log("Выберите действие с графом:");
+    console.log("1. Задание 2, номер 8. Вывести те вершины, у которых полустепень исхода больше полустепени захода. Только для ориентированых графов");
+    console.log("2. Задание 3 номер номер 3. Для каждой вершины графа вывести её степень. Любой граф");
+    console.log("3. Вернуться в редактор графа");
+    console.log("4. Завершить редактирование");
+
+    rl.question("Выберите действие: ", (choice) => {
+        switch (choice) {
+                case "1":
+                    if ((graph.constructor.name === "DirectedUnweightedGraph") || (graph.constructor.name === "DirectedWeightedGraph")) {
+                        const vertices = graph.findVerticesWithHigherOutDegree();
+                        console.log();
+                        if (vertices.length) { console.log("Вершины с полустепенью исхода больше полустепени захода:", vertices.join(", "));} 
+                        else { console.log("Таких вершин нет."); }
+                        zadaniya(graph); 
+                    } 
+                    else if ((graph.constructor.name === "UndirectedUnweightedGraph") || (graph.constructor.name === "UndirectedWeightedGraph")) {
+                        console.log();
+                        console.log("Ошибка: Эта задача применима только для ориентированных графов, поскольку в ориентированном графе у ребер нет направления.");
+                        zadaniya(graph);
+                    }
+                    break;
+                case"2":
+                    graph.calculateVertexDegrees();
+                    zadaniya(graph);
+                    break;
+                case "3":
+                    console.log("Возвращаемся в редактор графа...");
+                    editGraphMenu(graph);
+                    break;
+                case "4":
+                    console.log("Выход из редактирования графа.");
+                    rl.close();
+                    break;
+                default:
+                    console.log("Неверный выбор.");
+                    zadaniya(graph)
+                    break;
         }  
     });
 }

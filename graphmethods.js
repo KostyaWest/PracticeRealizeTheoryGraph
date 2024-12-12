@@ -105,7 +105,67 @@ class Graph {
     }
     return result;
   }
+
+  calculateVertexDegrees() {
+    const graphType = this.determineGraphType(); // Определяем тип графа
+    const degrees = {}; // Объект для хранения степеней вершин
+  
+    // Инициализация степеней вершин
+    for (const vertex in this.adjacencyList) {
+      degrees[vertex] = 0;
+    }
+  
+    if (graphType.includes("Directed")) {
+      // Для ориентированного графа
+      for (const vertex in this.adjacencyList) {
+        let outDegree = this.adjacencyList[vertex]?.length || 0; // Полустепень исхода
+        let inDegree = 0; // Полустепень захода
+  
+        // Считаем входящие рёбра
+        for (const v in this.adjacencyList) {
+          inDegree += this.adjacencyList[v].filter(edge => edge.node === vertex).length;
+        }
+  
+        // Петля прибавляет 1 и в исходящие, и во входящие рёбра
+        const loops = this.adjacencyList[vertex].filter(edge => edge.node === vertex).length;
+        outDegree += loops;
+        inDegree += loops;
+  
+        degrees[vertex] = { inDegree, outDegree };
+      }
+    } else {
+      // Для неориентированного графа
+      for (const vertex in this.adjacencyList) {
+        let degree = 0;
+  
+        for (const edge of this.adjacencyList[vertex]) {
+          degree += 1; // Считаем каждое инцидентное ребро
+          if (edge.node === vertex) {
+            degree += 1; // Петля прибавляет 2
+          }
+        }
+  
+        degrees[vertex] = degree / 2; // Делим на 2 для учёта дублирования
+      }
+    }
+  
+    // Выводим результат
+    console.log("\nСтепени вершин:");
+    for (const vertex in degrees) {
+      if (typeof degrees[vertex] === "object") {
+        console.log(`Вершина: ${vertex}, Входящие: ${degrees[vertex].inDegree}, Исходящие: ${degrees[vertex].outDegree}`);
+      } else {
+        console.log(`Вершина: ${vertex}, Степень: ${degrees[vertex]}`);
+      }
+    }
+  
+    return degrees; // Возвращаем степени вершин
+  }
+  
 }
+
+
+
 
 //фабрика графов
 class GraphFactory {
