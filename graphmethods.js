@@ -9,7 +9,7 @@ class Graph {
         throw new Error(`Вершина "${vertex}" уже существует!`);
     }
     this.adjacencyList[vertex] = [];
-}
+  }
     
   deleteVertex(vertex) {
     // Проверяем, существует ли вершина
@@ -154,6 +154,73 @@ class Graph {
 
     return reversedGraph; // Возвращаем обращённый граф
   }
+
+  isReachableFrom(vertex) {
+    const visited = new Set();
+    const queue = [[vertex, [vertex]]]; // Используем очередь вместо стека
+    const paths = {}; // Объект для хранения путей
+
+    while (queue.length) {
+        const [current, path] = queue.shift(); // Берём из начала очереди
+
+        if (!visited.has(current)) {
+            visited.add(current);
+
+            // Добавляем путь только если текущая вершина не совпадает с начальной
+            if (current !== vertex) {
+                paths[current] = path;
+            }
+
+            const neighbors = this.adjacencyList[current] || [];
+            for (const neighborObj of neighbors) {
+                const neighbor = neighborObj.node;
+
+                // Проверяем на петлю и прерываем выполнение
+                if (neighbor === current) {
+                    throw new Error(`Обнаружена петля в вершине: ${current}`);
+                }
+
+                if (!visited.has(neighbor)) {
+                    queue.push([neighbor, [...path, neighbor]]); // Добавляем в конец очереди
+                }
+            }
+        }
+    }
+
+    // Выводим все пути
+    console.log(`Пути из вершины ${vertex}:`);
+    for (const node in paths) {
+        console.log(`  ${vertex} -> ${node}: ${paths[node].join(" -> ")}`);
+    }
+
+    // Граф имеет корень, если количество посещённых вершин равно количеству всех вершин
+    return visited.size === Object.keys(this.adjacencyList).length;
+}
+
+
+
+findRoot() {
+  if (!Object.keys(this.adjacencyList).length) {
+      console.log("Граф пустой. Корень отсутствует.");
+      return null;
+  }
+
+  try {
+      for (const vertex in this.adjacencyList) {
+          console.log(`Проверяем вершину ${vertex} на корень...`);
+          if (this.isReachableFrom(vertex)) {
+              console.log(`Корень графа: ${vertex}`);
+              return vertex;
+          }
+      }
+      console.log("Корня в данном графе нет.");
+      return null;
+  } catch (error) {
+      console.error(`Ошибка: ${error.message}`);
+      process.exit(1); // Немедленное завершение программы
+  }
+}
+
 }
           
 
