@@ -229,7 +229,7 @@ function testgraph(graph){
     } catch (error) {
         console.log(`Ошибка при выполнении задания 1: ${error.message}`);
     }
-    // 9. Задание 2 (Вычисление степеней для всех вершин)
+    // 9. Задание 3 (Вычисление степеней для всех вершин)
     try {
         graph.calculateDegree();
         console.log("Степени всех вершин успешно вычислены.");
@@ -238,7 +238,7 @@ function testgraph(graph){
     }
 
     try {
-        // 10. Задание 3 (Обращение графа для ориентированных графов)
+        // 10. Задание 4 (Обращение графа для ориентированных графов)
         if ((graph.constructor.name === "DirectedUnweightedGraph") || (graph.constructor.name === "DirectedWeightedGraph")) {
             const reversedGraph = graph.reverseGraph();
             console.log("Структура обращённого графа:");
@@ -247,11 +247,18 @@ function testgraph(graph){
             console.log("Ошибка: Эта задача применима только для ориентированных графов.");
         }
     } catch (error) {
-        console.log(`Ошибка при выполнении задания 3: ${error.message}`);
+        console.log(`Ошибка при выполнении задания 4: ${error.message}`);
     }
-    
-  
+    try {
+        // 11. Задание 5 (ортграф ацикличный корень)
+        if ((graph.constructor.name === "DirectedUnweightedGraph") || (graph.constructor.name === "DirectedWeightedGraph")) {
+            graph.findRoot();
+        }
+    }
+        catch (error) {
+            console.log(`Ошибка при выполнении задания 5: ${error.message}`);
 
+        } 
     console.log("\n=======================================");
     console.log("          Тестирование завершено       ");
     console.log("=======================================\n");

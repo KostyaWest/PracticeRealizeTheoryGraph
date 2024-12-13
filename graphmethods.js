@@ -97,64 +97,94 @@ class Graph {
     if (isDirected && !isWeighted) return "DirectedUnweightedGraph";
     if (!isDirected && isWeighted) return "UndirectedWeightedGraph";
     if (!isDirected && !isWeighted) return "UndirectedUnweightedGraph";
-}
-
+  }
 
   //полустепени. второе задание
   findVerticesWithHigherOutDegree() {
+    const inDegrees = {}; 
     const result = [];
+
+    // Инициализация входящих степеней
+    for (const vertex in this.adjacencyList) {
+        inDegrees[vertex] = 0;
+    }
+
+    // Подсчёт входящих степеней
+    for (const vertex in this.adjacencyList) {
+        for (const edge of this.adjacencyList[vertex]) {
+            inDegrees[edge.node] = (inDegrees[edge.node] || 0) + 1;
+        }
+    }
+
+    // Сравнение исходящих и входящих степеней
     for (const vertex in this.adjacencyList) {
         const outDegree = this.adjacencyList[vertex]?.length || 0;
-        let inDegree = 0;
-        for (const v in this.adjacencyList) { inDegree += this.adjacencyList[v].filter(edge => edge.node === vertex).length; }
-          console.log(`Вершина: ${vertex}, Исходящие рёбра: ${outDegree}, Входящие рёбра: ${inDegree}`);
-        if (outDegree > inDegree) { result.push(vertex); }
+        const inDegree = inDegrees[vertex];
+        console.log(`Вершина: ${vertex}, Исходящие рёбра: ${outDegree}, Входящие рёбра: ${inDegree}`);
+        if (outDegree > inDegree) {
+            result.push(vertex);
+        }
     }
+
     return result;
   }
 
   //степени. третье задание
   calculateDegree() {
     const degrees = {};
-    for (const vertex in this.adjacencyList) {
-        const outDegree = this.adjacencyList[vertex]?.length || 0;
-        let inDegree = 0;
-        for (const v in this.adjacencyList) { inDegree += this.adjacencyList[v].filter(edge => edge.node === vertex).length; }
-        const graphType = this.determineGraphType();
-        if (graphType === "DirectedUnweightedGraph" || graphType === "DirectedWeightedGraph") { degrees[vertex] = inDegree + outDegree;} 
-        else { degrees[vertex] = (inDegree + outDegree) / 2; }
-      console.log(`Вершина: ${vertex}, Степень: ${degrees[vertex]}`);
-    }
-  return degrees;
-  }
+    const inDegrees = {};
 
-  reverseGraph() {
-    const reversedGraph = new this.constructor(); // Создаём новый граф того же типа
-
-    // Сначала добавим все вершины в новый граф, чтобы избежать ошибок
+    // Инициализация
     for (const vertex in this.adjacencyList) {
-        if (!reversedGraph.adjacencyList[vertex]) {
-            reversedGraph.adjacencyList[vertex] = []; // Создаём пустой список для вершины
-        }
+        inDegrees[vertex] = 0;
     }
 
-    // Теперь добавляем рёбра в обратном порядке
+    // Подсчёт входящих степеней
     for (const vertex in this.adjacencyList) {
         for (const edge of this.adjacencyList[vertex]) {
-            // Проверяем тип графа и используем соответствующий метод для добавления рёбер
-            if (this.constructor.name === "DirectedWeightedGraph") {
-                reversedGraph.addDirectedEdge(edge.node, vertex, edge.weight);
-            } else if (this.constructor.name === "DirectedUnweightedGraph") {
-                reversedGraph.addDirectedEdgeNonWeight(edge.node, vertex);
-            } else {
-                throw new Error("Метод reverseGraph не поддерживается для данного типа графа.");
-            }
+            inDegrees[edge.node] = (inDegrees[edge.node] || 0) + 1;
         }
     }
 
-    return reversedGraph; // Возвращаем обращённый граф
+    const graphType = this.determineGraphType(); // Определяем тип графа один раз
+
+    // Подсчёт степеней
+    for (const vertex in this.adjacencyList) {
+        const outDegree = this.adjacencyList[vertex]?.length || 0;
+        const inDegree = inDegrees[vertex];
+        degrees[vertex] = (graphType.includes("Directed")) ? (inDegree + outDegree) : (inDegree + outDegree) / 2;
+
+        console.log(`Вершина: ${vertex}, Степень: ${degrees[vertex]}`);
+    }
+
+    return degrees;
   }
 
+  //реверсграф. четвертое задание
+  reverseGraph() {
+    const reversedGraph = new this.constructor(); 
+
+    // Добавляем все вершины
+    for (const vertex in this.adjacencyList) {
+        reversedGraph.adjacencyList[vertex] = [];
+    }
+
+    // Определяем метод добавления рёбер
+    const isWeighted = this.constructor.name === "DirectedWeightedGraph";
+    const addEdge = isWeighted 
+        ? (u, v, weight) => reversedGraph.addDirectedEdge(v, u, weight)
+        : (u, v) => reversedGraph.addDirectedEdgeNonWeight(v, u);
+
+    // Инвертируем рёбра
+    for (const vertex in this.adjacencyList) {
+        for (const edge of this.adjacencyList[vertex]) {
+            isWeighted ? addEdge(vertex, edge.node, edge.weight) : addEdge(vertex, edge.node);
+        }
+    }
+    return reversedGraph;
+  }
+
+  //путь А-Б. пятое задание
   isReachableFrom(vertex) {
     const visited = new Set();
     const queue = [[vertex, [vertex]]]; // Используем очередь вместо стека
@@ -195,31 +225,29 @@ class Graph {
 
     // Граф имеет корень, если количество посещённых вершин равно количеству всех вершин
     return visited.size === Object.keys(this.adjacencyList).length;
-}
-
-
-
-findRoot() {
-  if (!Object.keys(this.adjacencyList).length) {
-      console.log("Граф пустой. Корень отсутствует.");
-      return null;
   }
+  findRoot() {
+    if (!Object.keys(this.adjacencyList).length) {
+        console.log("Граф пустой. Корень отсутствует.");
+        return null;
+    }
 
-  try {
-      for (const vertex in this.adjacencyList) {
-          console.log(`Проверяем вершину ${vertex} на корень...`);
-          if (this.isReachableFrom(vertex)) {
-              console.log(`Корень графа: ${vertex}`);
-              return vertex;
-          }
-      }
-      console.log("Корня в данном графе нет.");
-      return null;
-  } catch (error) {
-      console.error(`Ошибка: ${error.message}`);
-      process.exit(1); // Немедленное завершение программы
+    for (const vertex in this.adjacencyList) {
+        console.log(`Проверяем вершину ${vertex} на корень...`);
+        try {
+            if (this.isReachableFrom(vertex)) {
+                console.log(`Корень графа: ${vertex}`);
+                return vertex;
+            }
+        } catch (error) {
+            console.error(`Ошибка: ${error.message}`);
+            return null;
+        }
+    }
+
+    console.log("Корня в данном графе нет.");
+    return null;
   }
-}
 
 }
           
@@ -267,7 +295,6 @@ class GraphFactory {
       }
   }
 }
-
 
 // <----------------------------------------------------класс для неориентированного невзвешенного графа--------------------------------------------------->
 
