@@ -235,7 +235,7 @@ class UndirectedUnweightedGraph extends Graph {
     }
     this.adjacencyList[vertex1].push({ node: vertex2});
     this.adjacencyList[vertex2].push({ node: vertex1});
-    console.log(`Неориентированное невзвешенное ребро между ${vertex1} и ${vertex2} добавлено.`);
+    // console.log(`Неориентированное невзвешенное ребро между ${vertex1} и ${vertex2} добавлено.`);
   }
 
   deleteUndirectedEdgeNonWeight(vertex1, vertex2) {
@@ -297,7 +297,7 @@ class UndirectedWeightedGraph extends Graph {
 
     this.adjacencyList[vertex1].push({ node: vertex2, weight });
     this.adjacencyList[vertex2].push({ node: vertex1, weight });
-    console.log(`Неориентированное взвешенное ребро между ${vertex1} и ${vertex2} добавлено.`);
+    // console.log(`Неориентированное взвешенное ребро между ${vertex1} и ${vertex2} добавлено.`);
   }
 
   deleteUndirectedEdge(vertex1, vertex2) {
@@ -357,7 +357,7 @@ class DirectedUnweightedGraph extends Graph {
     }
 
     this.adjacencyList[vertex1].push({ node: vertex2});
-    console.log(`Ориентированное невзвешенное ребро между ${vertex1} и ${vertex2} добавлено.`);
+    // console.log(`Ориентированное невзвешенное ребро между ${vertex1} и ${vertex2} добавлено.`);
   }
   
   deleteDirectedEdgeNonWeight(vertex1, vertex2) {
@@ -416,7 +416,7 @@ class DirectedWeightedGraph extends Graph {
     // Добавление нового ребра
     this.adjacencyList[vertex1].push({ node: vertex2, weight });
     console.log(
-      `Ориентированное взвешенное ребро между ${vertex1} и ${vertex2} добавлено.`
+      // `Ориентированное взвешенное ребро между ${vertex1} и ${vertex2} добавлено.`
     );
   }
   

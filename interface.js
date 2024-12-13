@@ -148,14 +148,12 @@ function editGraphMenu(graph) {
                     // После выполнения кода (успех или ошибка) возвращаем в меню
                     editGraphMenu(graph);
                 });
-                
             case "2":
                 rl.question("Введите имя вершины: ", (vertex) => {
                     graph.deleteVertex(vertex);
                     editGraphMenu(graph); // Возвращаемся в меню
                 });
                 break;
-               
             case "3":
                 rl.question("Введите вершины и вес, если у вас взвешанный граф через пробел: ", (input) => {
                     try {
@@ -169,20 +167,24 @@ function editGraphMenu(graph) {
                         switch (graph.constructor.name) {
                             case "UndirectedUnweightedGraph":
                                 graph.addUndirectedEdgeNonWeight(v1, v2);
+                                console.log(`Неориентированное невзвешенное ребро между ${v1} и ${v2} добавлено`);
                                 break;
             
                             case "UndirectedWeightedGraph":
                                 if (!weight) throw new Error("Ошибка: необходимо ввести вес для взвешенного графа.");
                                 graph.addUndirectedEdge(v1, v2, parseFloat(weight));
+                                console.log(`Неориентированное взвешенное ребро между ${v1} и ${v2} с весом ${weight} добавлено`);
                                 break;
             
                             case "DirectedUnweightedGraph":
                                 graph.addDirectedEdgeNonWeight(v1, v2);
+                                console.log(`Ориентированное невзвешенное ребро между ${v1} и ${v2} добавлено`);
                                 break;
             
                             case "DirectedWeightedGraph":
                                 if (!weight) throw new Error("Ошибка: необходимо ввести вес для взвешенного графа.");
                                 graph.addDirectedEdge(v1, v2, parseFloat(weight));
+                                console.log(`Ориентированное взвешенное ребро между ${v1} и ${v2} с весом ${weight} добавлено`);
                                 break;
             
                             default:

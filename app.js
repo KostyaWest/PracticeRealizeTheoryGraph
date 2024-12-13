@@ -2,11 +2,6 @@ const fs = require('fs');
 const path = require('path');
 const { GraphFactory, Graph } = require('./graphmethods');
 
-// const rl = readline.createInterface({
-//     input: process.stdin,
-//     output: process.stdout
-// });
-
 function validateAdjacencyList(adjacencyList) {
     // Проверяем, что adjacencyList - это объект
     if (typeof adjacencyList !== 'object' || adjacencyList === null) {
