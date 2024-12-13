@@ -112,6 +112,33 @@ class Graph {
     }
   return degrees;
   }
+
+  reverseGraph() {
+    const reversedGraph = new this.constructor(); // Создаём новый граф того же типа
+
+    // Сначала добавим все вершины в новый граф, чтобы избежать ошибок
+    for (const vertex in this.adjacencyList) {
+        if (!reversedGraph.adjacencyList[vertex]) {
+            reversedGraph.adjacencyList[vertex] = []; // Создаём пустой список для вершины
+        }
+    }
+
+    // Теперь добавляем рёбра в обратном порядке
+    for (const vertex in this.adjacencyList) {
+        for (const edge of this.adjacencyList[vertex]) {
+            // Проверяем тип графа и используем соответствующий метод для добавления рёбер
+            if (this.constructor.name === "DirectedWeightedGraph") {
+                reversedGraph.addDirectedEdge(edge.node, vertex, edge.weight);
+            } else if (this.constructor.name === "DirectedUnweightedGraph") {
+                reversedGraph.addDirectedEdgeNonWeight(edge.node, vertex);
+            } else {
+                throw new Error("Метод reverseGraph не поддерживается для данного типа графа.");
+            }
+        }
+    }
+
+    return reversedGraph; // Возвращаем обращённый граф
+  }
 }
           
 

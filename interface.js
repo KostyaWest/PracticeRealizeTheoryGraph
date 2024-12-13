@@ -249,8 +249,10 @@ function zadaniya(graph) {
     console.log("Выберите действие с графом:");
     console.log("1. Задание 2, номер 8. Вывести те вершины, у которых полустепень исхода больше полустепени захода. Только для ориентированых графов");
     console.log("2. Задание 3 номер номер 3. Для каждой вершины графа вывести её степень. Любой граф");
-    console.log("3. Вернуться в редактор графа");
-    console.log("4. Завершить редактирование");
+    console.log("3. Задание 4, номер 4. Построить орграф, являющийся обращением данного орграфа (каждая дуга перевёрнута). Только для ориентированых графов");
+
+    console.log("4. Вернуться в редактор графа");
+    console.log("5. Завершить редактирование");
 
     rl.question("Выберите действие: ", (choice) => {
         switch (choice) {
@@ -272,10 +274,22 @@ function zadaniya(graph) {
                     zadaniya(graph);
                     break;
                 case "3":
+                    if ((graph.constructor.name === "DirectedUnweightedGraph") || (graph.constructor.name === "DirectedWeightedGraph")) {
+                        const reversedGraph = graph.reverseGraph();
+                        console.log("Структура обращённого графа:");
+                        console.log(reversedGraph.adjacencyList);
+                    } 
+                    else {
+                        console.log();
+                        console.log("Ошибка: Эта задача применима только для ориентированных графов.");
+                    }
+                    zadaniya(graph);
+                    break;
+                case "4":
                     console.log("Возвращаемся в редактор графа...");
                     editGraphMenu(graph);
                     break;
-                case "4":
+                case "5":
                     console.log("Выход из редактирования графа.");
                     rl.close();
                     break;
