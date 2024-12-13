@@ -256,6 +256,7 @@ function zadaniya(graph) {
     console.log("2. Задание 3, номер 3. Для каждой вершины графа вывести её степень. Любой граф");
     console.log("3. Задание 4, номер 4. Построить орграф, являющийся обращением данного орграфа (каждая дуга перевёрнута). Только для ориентированых графов");
     console.log("4. задание 5, номер 7. Вывести корень ацикличного орграфа. Только для ориентированых графов");
+    console.log("5. задание 6, номер 1. Найти все вершины орграфа, из которых существует путь в данную. Только для ориентированых графов");
     
     console.log("9. Вернуться в редактор графа");
     console.log("10. Завершить редактирование");
@@ -303,10 +304,18 @@ function zadaniya(graph) {
                     zadaniya(graph);
                     break;
                 case "5":
-                    console.log("пусто");
-                    break;
-                case "6":
-                    console.log("пусто");
+                    if (
+                        graph.constructor.name === "DirectedUnweightedGraph" ||
+                        graph.constructor.name === "DirectedWeightedGraph"
+                    ) {
+                        rl.question("Введите вершину, в которую нужно найти пути: ", (targetVertex) => {
+                            graph.findVerticesWithPathTo(targetVertex);
+                            zadaniya(graph);
+                        });
+                    } else {
+                        console.log("Ошибка: Эта задача применима только для ориентированных графов.");
+                        zadaniya(graph);
+                    }
                     break;
                 case "7":
                     console.log("пусто");

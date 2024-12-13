@@ -184,7 +184,47 @@ class Graph {
     return reversedGraph;
   }
 
-  //путь А-Б. пятое задание
+  //поиск к узлу. Шестое задание
+  findVerticesWithPathTo(targetVertex) {
+    if (!this.adjacencyList[targetVertex]) {
+        console.log(`Вершина "${targetVertex}" отсутствует в графе.`);
+        return {};
+    }
+
+    // Строим обращённый граф
+    const reversedGraph = this.reverseGraph();
+
+    // Обход в глубину с сохранением путей
+    const visited = new Set();
+    const paths = {}; // Хранение путей к целевой вершине
+
+    const dfs = (vertex, path) => {
+        visited.add(vertex);
+        paths[vertex] = path;
+
+        for (const neighbor of reversedGraph.adjacencyList[vertex]) {
+            if (!visited.has(neighbor.node)) {
+                dfs(neighbor.node, [neighbor.node, ...path]); // Передаём новый путь
+            }
+        }
+    };
+
+    // Запускаем DFS из целевой вершины
+    dfs(targetVertex, [targetVertex]);
+
+    // Удаляем целевую вершину из результата
+    delete paths[targetVertex];
+
+    // Выводим результат
+    console.log(`Вершины и пути, из которых существует путь в "${targetVertex}":`);
+    for (const vertex in paths) {
+        console.log(`${vertex} -> ${paths[vertex].join(" -> ")}`);
+    }
+
+    return paths;
+}
+
+  //путь А-Б. пятое задание. Обход в ширину
   isReachableFrom(vertex) {
     const visited = new Set();
     const queue = [[vertex, [vertex]]]; // Используем очередь вместо стека
