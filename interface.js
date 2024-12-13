@@ -4,6 +4,49 @@ const path = require('path');
 const { GraphFactory, Graph } = require('./graphmethods');
 const { saveGraphToFile, loadGraphFromFile } = require('./app');
 
+//-----------------------------ошибки-----------------------------
+const testFiles = [
+    'Неправильнаяструктура.txt',
+    'Неправильныйформат.txt',
+    'Нетсоседей.txt',
+    'Некорректноезначениеузла.txt',
+    'Дублирующиесяребра.txt',
+//    'Отрицательныеребра.txt', нужно уточнить
+    'Неправильныйвес.txt',
+    'Несуществующийграф.txt',
+
+];
+
+// Запуск тестов по кнопке
+function testBrokenGraphs() {
+  // Массив промисов для загрузки файлов
+  const filePromises = testFiles.map((fileName, index) => {
+    return loadGraphFromFile(fileName)
+        .then(() => {
+            console.log(`${index + 1}. Файл "${fileName}" загружен успешно.`);
+        })
+        .catch(error => {
+            console.log(`${index + 1}. Ошибка при загрузке файла: "${fileName}"`);
+            console.log(`   Причина: ${error.message}`);
+            if (error.details) {
+                console.log(`   Детали: ${error.details}`);
+            }
+            console.log("---------------------------------------\n");
+        });
+});
+
+// Ожидаем завершения всех промисов, а затем возвращаемся в меню
+Promise.all(filePromises)
+    .then(() => {
+        showMainMenu(); // Возвращаемся в меню после завершения тестов
+    })
+    .catch(error => {
+        console.log("Произошла ошибка при тестировании файлов: ", error);
+        showMainMenu(); // Возвращаемся в меню, даже если произошла ошибка
+    });
+}
+// ---------------------------------------------------------------------------------------------------------------
+
 // Создаем интерфейс для ввода с консоли
 const rl = readline.createInterface({
     input: process.stdin,
@@ -48,9 +91,9 @@ function showMainMenu() {
     console.log("1. Загрузить существующий граф из файла");
     console.log("2. Работать в новом");
     console.log("3. Запустить файлы в которых намеренно сделаны ошибки, для проверки программы")
-    console.log("3. Завершиить программу");
+    console.log("4. Завершиить программу");
 
-    rl.question('Выберите опцию (1/2/3): ', (choice) => {
+    rl.question('Выберите задачу: ', (choice) => {
         switch (choice) {
             case '1':
                 loadGraph(); // Загружаем граф из файла
@@ -58,6 +101,12 @@ function showMainMenu() {
             case '2':
                 console.log("Работаем с новым графом...");
                 createNewGraph();
+                break;
+            case '3':
+                console.log("=======================================");
+                console.log("        РЕЗУЛЬТАТ ЗАГРУЗКИ ФАЙЛОВ      ");
+                console.log("=======================================\n");
+                testBrokenGraphs(); // Ждём завершения тестов
                 break;
             case '4':
                 console.log("Завершаем программу...");
