@@ -65,25 +65,40 @@ class Graph {
 
   //определитель типа графа
   determineGraphType() {
-    let isDirected = false;
-    let isWeighted = false;
+    let isDirected = false;          // Флаг для проверки ориентированности
+    let isWeighted = false;          // Флаг для взвешенности графа
+    let hasUnweightedEdge = false;   // Флаг для наличия рёбер без веса
 
     // Проходим по всем вершинам и их рёбрам
     for (let vertex in this.adjacencyList) {
-      for (let edge of this.adjacencyList[vertex]) {
-        // Проверяем на взвешенность
-        if (edge.weight !== undefined) { isWeighted = true; }
+        for (let edge of this.adjacencyList[vertex]) {
+            // Проверяем на взвешенность
+            if (edge.weight !== undefined) {
+                isWeighted = true; // Есть взвешенное ребро
+            } else {
+                hasUnweightedEdge = true; // Есть невзвешенное ребро
+            }
 
-        // Проверяем на ориентированность
-        if (!this.adjacencyList[edge.node]?.some(e => e.node === vertex)) { isDirected = true; }
-      }
+            // Проверяем на ориентированность
+            if (!this.adjacencyList[edge.node]?.some(e => e.node === vertex)) {
+                isDirected = true; // Если обратного ребра нет, то граф ориентированный
+            }
+        }
     }
+
+    // Проверка на смешанность графа (одновременно взвешенные и невзвешенные рёбра)
+    if (isWeighted && hasUnweightedEdge) {
+        console.log("Граф смешанный, не поддерживается в данной версии приложения.");
+        return null; // Возвращаем null для смешанных графов
+    }
+
     // Возвращаем тип графа
     if (isDirected && isWeighted) return "DirectedWeightedGraph";
     if (isDirected && !isWeighted) return "DirectedUnweightedGraph";
     if (!isDirected && isWeighted) return "UndirectedWeightedGraph";
     if (!isDirected && !isWeighted) return "UndirectedUnweightedGraph";
-  }
+}
+
 
   //полустепени. второе задание
   findVerticesWithHigherOutDegree() {

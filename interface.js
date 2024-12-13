@@ -47,6 +47,7 @@ function showMainMenu() {
     console.log("Вы хотите загрузить существующий граф из файла или создать новый?");
     console.log("1. Загрузить существующий граф из файла");
     console.log("2. Работать в новом");
+    console.log("3. Запустить файлы в которых намеренно сделаны ошибки, для проверки программы")
     console.log("3. Завершиить программу");
 
     rl.question('Выберите опцию (1/2/3): ', (choice) => {
@@ -58,7 +59,7 @@ function showMainMenu() {
                 console.log("Работаем с новым графом...");
                 createNewGraph();
                 break;
-            case '3':
+            case '4':
                 console.log("Завершаем программу...");
                 rl.close();
                 break;
