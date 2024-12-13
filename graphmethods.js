@@ -171,6 +171,57 @@ class Graph {
 
     return degrees; // Возвращаем степени вершин
   }
+  // 
+  // Универсальная функция для подсчёта степеней
+  calculateDegrees(isDirected = this.isDirected) {
+    const degrees = {};
+
+    for (const vertex in this.adjacencyList) {
+      if (isDirected) {
+        // Для ориентированного графа: инициализируем полустепени
+        degrees[vertex] = { inDegree: 0, outDegree: 0 };
+      } else {
+        // Для неориентированного графа: инициализируем общую степень
+        degrees[vertex] = 0;
+      }
+    }
+
+    for (const vertex in this.adjacencyList) {
+      for (const edge of this.adjacencyList[vertex]) {
+        if (isDirected) {
+          // Полустепени для ориентированного графа
+          degrees[vertex].outDegree += 1; // Исходящие рёбра
+          degrees[edge.node].inDegree += 1; // Входящие рёбра
+        } else {
+          // Степень для неориентированного графа
+          degrees[vertex] += 1; // Каждое ребро инцидентно вершине
+        }
+      }
+    }
+
+    return degrees;
+  }
+
+  // Второе задание: вывести полустепени вершин
+  displaySemiDegrees() {
+    const degrees = this.calculateDegrees(true); // Ориентированный граф
+    console.log("\nПолустепени вершин (ориентированный граф):");
+    for (const vertex in degrees) {
+      console.log(
+        `Вершина: ${vertex}, Входящие: ${degrees[vertex].inDegree}, Исходящие: ${degrees[vertex].outDegree}`
+      );
+    }
+  }
+
+  // Третье задание: вывести степени вершин
+  displayDegrees() {
+    const degrees = this.calculateDegrees(false); // Неориентированный граф
+    console.log("\nСтепени вершин (неориентированный граф):");
+    for (const vertex in degrees) {
+      console.log(`Вершина: ${vertex}, Степень: ${degrees[vertex]}`);
+    }
+  }
+// 
 }
           
 

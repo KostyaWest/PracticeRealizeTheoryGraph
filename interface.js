@@ -262,7 +262,7 @@ function zadaniya(graph) {
                         else { console.log("Таких вершин нет."); }
                         zadaniya(graph); 
                     } 
-                    else if ((graph.constructor.name === "UndirectedUnweightedGraph") || (graph.constructor.name === "UndirectedWeightedGraph")) {
+                    else {
                         console.log();
                         console.log("Ошибка: Эта задача применима только для ориентированных графов, поскольку в ориентированном графе у ребер нет направления.");
                         zadaniya(graph);
