@@ -259,17 +259,16 @@ function zadaniya(graph) {
                         const vertices = graph.findVerticesWithHigherOutDegree();
                         console.log();
                         if (vertices.length) { console.log("Вершины с полустепенью исхода больше полустепени захода:", vertices.join(", "));} 
-                        else { console.log("Таких вершин нет."); }
-                        zadaniya(graph); 
+                        else { console.log("Таких вершин нет."); } 
                     } 
                     else {
                         console.log();
                         console.log("Ошибка: Эта задача применима только для ориентированных графов, поскольку в ориентированном графе у ребер нет направления.");
-                        zadaniya(graph);
                     }
+                    zadaniya(graph);
                     break;
                 case"2":
-                    graph.calculateVertexDegrees();
+                    graph.calculateDegree(); // Универсальный вывод степеней
                     zadaniya(graph);
                     break;
                 case "3":
