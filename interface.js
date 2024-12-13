@@ -2,52 +2,7 @@ const readline = require('readline');
 const fs = require('fs');
 const path = require('path');
 const { GraphFactory, Graph } = require('./graphmethods');
-const { saveGraphToFile, loadGraphFromFile } = require('./app');
-
-//-----------------------------ошибки-----------------------------
-const testFiles = [
-    'Неправильнаяструктура.txt',
-    'Неправильныйформат.txt',
-    'Нетсоседей.txt',
-    'Некорректноезначениеузла.txt',
-    'Дублирующиесяребра.txt',
-//    'Отрицательныеребра.txt', нужно уточнить
-    'Неправильныйвес.txt',
-    'Несуществующийграф.txt',
-
-];
-
-// Запуск тестов по кнопке
-function testBrokenGraphs() {
-  // Массив промисов для загрузки файлов
-  const filePromises = testFiles.map((fileName, index) => {
-    return loadGraphFromFile(fileName)
-        .then(() => {
-            console.log(`${index + 1}. Файл "${fileName}" загружен успешно.`);
-        })
-        .catch(error => {
-            console.log(`${index + 1}. Ошибка при загрузке файла: "${fileName}"`);
-            console.log(`   Причина: ${error.message}`);
-            if (error.details) {
-                console.log(`   Детали: ${error.details}`);
-            }
-            console.log("---------------------------------------\n");
-        });
-});
-
-// Ожидаем завершения всех промисов, а затем возвращаемся в меню
-Promise.all(filePromises)
-    .then(() => {
-        showMainMenu(); // Возвращаемся в меню после завершения тестов
-    })
-    .catch(error => {
-        console.log("Произошла ошибка при тестировании файлов: ", error);
-        showMainMenu(); // Возвращаемся в меню, даже если произошла ошибка
-    });
-}
-// ---------------------------------------------------------------------------------------------------------------
-
-// Создаем интерфейс для ввода с консоли
+const { saveGraphToFile, loadGraphFromFile, testgraph, printGraphType, testFiles, testBrokenGraphs } = require('./app');
 const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
@@ -59,21 +14,6 @@ function startApp() {
 
 startApp();  // Начинаем приложение
 
-// -------------------------------------------------функции для вызова функций--------------------------------------------------------------
-
-function printGraphType(graph) {
-    const graphTypeMap = {
-        "UndirectedUnweightedGraph": "Неориентированный невзвешенный граф",
-        "UndirectedWeightedGraph": "Неориентированный взвешенный граф",
-        "DirectedUnweightedGraph": "Ориентированный невзвешенный граф",
-        "DirectedWeightedGraph": "Ориентированный взвешенный граф"
-    };
-
-    const graphType = graphTypeMap[graph.constructor.name] || "Неизвестный тип графа";
-
-    console.log(`\nТекущий граф: ${graphType}`);
-}
-
 async function saveGraph(graph) {
     rl.question('Введите название файла: ', (fileName) => {
         if (!fileName.endsWith('.txt')) { fileName += '.txt'; }
@@ -82,9 +22,6 @@ async function saveGraph(graph) {
     });
 }
 
-
-// ---------------------------------------------------------------------------------------------------------------
-// Приветствие и интерфейс выбора
 function showMainMenu() {
     console.log("Привет!");
     console.log("Вы хотите загрузить существующий граф из файла или создать новый?");
@@ -106,7 +43,7 @@ function showMainMenu() {
                 console.log("=======================================");
                 console.log("        РЕЗУЛЬТАТ ЗАГРУЗКИ ФАЙЛОВ      ");
                 console.log("=======================================\n");
-                testBrokenGraphs(); // Ждём завершения тестов
+                testBrokenGraphs(showMainMenu); // Ждём завершения тестов
                 break;
             case '4':
                 console.log("Завершаем программу...");
@@ -121,10 +58,6 @@ function showMainMenu() {
     });
 }
 
-
-
-
-// Функция для выбора и загрузки графа
 async function loadGraph() {
     rl.question('Введите название файла: ', async (fileName) => {
         if (!fileName.endsWith('.txt')) {
@@ -177,168 +110,6 @@ function createNewGraph() {
     });
 }
 
-//тотальный тест
-function testgraph(graph){
-    console.log("=======================================");
-    console.log("    Тестирование операций с графом    ");
-    console.log("=======================================\n");
-    // 1. Добавление узла
-    try {
-        const testNode = "testuzel";
-        graph.addVertex(testNode);
-        console.log(`Узел "${testNode}" успешно добавлен.`);
-    } catch (error) {
-        console.log(`Ошибка при добавлении узла: ${error.message}`);
-    }
-    try {
-        const testNode = "testuzel2";
-        graph.addVertex(testNode);
-        console.log(`Узел "${testNode}" успешно добавлен.`);
-    } catch (error) {
-        console.log(`Ошибка при добавлении узла: ${error.message}`);
-    }
-    try {
-        const testNode = "testuzel3";
-        graph.addVertex(testNode);
-        console.log(`Узел "${testNode}" успешно добавлен.`);
-    } catch (error) {
-        console.log(`Ошибка при добавлении узла: ${error.message}`);
-    }
-    try {
-        const testNode = "testuzel4";
-        graph.addVertex(testNode);
-        console.log(`Узел "${testNode}" успешно добавлен.`);
-    } catch (error) {
-        console.log(`Ошибка при добавлении узла: ${error.message}`);
-    }
-    // 2. Добавление петли
-    try {
-        graph.addUndirectedEdge("testuzel", "testuzel", 12);
-        console.log("Петля addUndirectedEdge для узла 'testuzel' успешно добавлена.");
-    } catch (error) {
-        console.log(`Ошибка addUndirectedEdge при добавлении петли: ${error.message}`);
-    }
-    try {
-        graph.addDirectedEdgeNonWeight("testuzel", "testuzel");
-        console.log("Петля addDirectedEdgeNonWeight для узла 'testuzel' успешно добавлена.");
-    } catch (error) {
-        console.log(`Ошибка addUndirectedEdge при добавлении петли: ${error.message}`);
-    }
-    try {
-        graph.addDirectedEdge("testuzel", "testuzel", 12);
-        console.log("Петля addDirectedEdge для узла 'testuzel' успешно добавлена.");
-    } catch (error) {
-        console.log(`Ошибка addUndirectedEdge при добавлении петли: ${error.message}`);
-    }
-    try {
-        graph.addUndirectedEdgeNonWeight("testuzel", "testuzel");
-        console.log("Петля addDirectedEdge для узла 'testuzel' успешно добавлена.");
-    } catch (error) {
-        console.log(`Ошибка addUndirectedEdge при добавлении петли: ${error.message}`);
-    }
-    // 3. Добавление одних и тех же ребер рёбер без веса
-    try {
-        graph.addUndirectedEdgeNonWeight("testuzel", "testuzel2");
-        //console.log("Неориентированое невзвешенное ребро между узлами testuzel и testuzel2 успешно добавлено.");
-    } catch (error) {
-        console.log(`Ошибка при добавлении рёбер без веса: ${error.message}`);
-    }
-    try {
-        graph.addDirectedEdgeNonWeight("testuzel", "testuzel2");
-       // console.log("Ориентированое невзвешенное Ребро без веса между testuzel и testuzel2 успешно добавлено.");
-    } catch (error) {
-        console.log(`Ошибка при добавлении рёбер без веса: ${error.message}`);
-    }
-    // 4. Добавление рёбер с весом
-    try {
-        graph.addUndirectedEdge("testuzel2", "testuzel3", 5);
-       // console.log("Ребро с весом между testuzel2 и testuzel3 успешно добавлено.");
-    } catch (error) {
-        console.log(`Ошибка при добавлении рёбер с весом: ${error.message}`);
-    }
-    try {
-        graph.addDirectedEdge("testuzel2", "testuzel3", 5);
-      //  console.log("Ребро с весом между testuzel2 и testuzel3 успешно добавлено.");
-    } catch (error) {
-        console.log(`Ошибка при добавлении рёбер с весом: ${error.message}`);
-    }
-    // 5. Удаление ребра
-    try {
-        graph.deleteUndirectedEdge("testuzel2", "testuzel3");
-        console.log("Петля для узла 'testuzel' успешно удалена.");
-    } catch (error) {
-        console.log(`Ошибка при удалении петли: ${error.message}`);
-    }
-    // 6. Удаление петли
-    try {
-        graph.deleteUndirectedEdge("testuzel", "testuzel");
-        console.log("Петля для узла 'testuzel' успешно удалена.");
-    } catch (error) {
-        console.log(`Ошибка при удалении петли: ${error.message}`);
-    }
-     //7. Удаление узла
-     try {
-        graph.deleteVertex("testuzel");
-        console.log("Узел 'testuzel' успешно удалён.");
-    } catch (error) {
-        console.log(`Ошибка при удалении узла: ${error.message}`);
-    }
-    //8. Принт графа
-    try {
-        graph.printGraph();
-        console.log("принт графа.");
-    } catch (error) {
-        console.log(`Ошибка при выводе графа: ${error.message}`);
-    }
-    //2-е задание
-    try {
-        graph.printGraph();
-        console.log("принт графа.");
-    } catch (error) {
-        console.log(`Ошибка при выводе графа: ${error.message}`);
-    }
-    try {
-        if ((graph.constructor.name === "DirectedUnweightedGraph") || (graph.constructor.name === "DirectedWeightedGraph")) {
-            const vertices = graph.findVerticesWithHigherOutDegree();
-            if (vertices.length) {
-                console.log("Вершины с полустепенью исхода больше полустепени захода:", vertices.join(", "));
-            } else {
-                console.log("Таких вершин нет.");
-            }
-        } else {
-            console.log("Ошибка: Эта задача применима только для ориентированных графов, поскольку в ориентированном графе у рёбер есть направление.");
-        }
-    } catch (error) {
-        console.log(`Ошибка при выполнении задания 1: ${error.message}`);
-    }
-    // 9. Задание 2 (Вычисление степеней для всех вершин)
-    try {
-        graph.calculateDegree();
-        console.log("Степени всех вершин успешно вычислены.");
-    } catch (error) {
-        console.log(`Ошибка при вычислении степеней: ${error.message}`);
-    }
-
-    try {
-        // 10. Задание 3 (Обращение графа для ориентированных графов)
-        if ((graph.constructor.name === "DirectedUnweightedGraph") || (graph.constructor.name === "DirectedWeightedGraph")) {
-            const reversedGraph = graph.reverseGraph();
-            console.log("Структура обращённого графа:");
-            console.log(reversedGraph.adjacencyList);
-        } else {
-            console.log("Ошибка: Эта задача применима только для ориентированных графов.");
-        }
-    } catch (error) {
-        console.log(`Ошибка при выполнении задания 3: ${error.message}`);
-    }
-    
-  
-
-    console.log("\n=======================================");
-    console.log("          Тестирование завершено       ");
-    console.log("=======================================\n");
-}
-
 function editGraphMenu(graph) {
     printGraphType(graph);
     console.log("Выберите действие с графом:");
@@ -372,45 +143,57 @@ function editGraphMenu(graph) {
                         graph.addVertex(vertex);
                         console.log(`Вершина "${vertex}" успешно добавлена.`);
                     } catch (error) {
-                        console.error(error.message);
+                        console.error(error.message);  // Выводим сообщение об ошибке
                     }
-                    editGraphMenu(graph); // Возвращаемся в меню
+                    // После выполнения кода (успех или ошибка) возвращаем в меню
+                    editGraphMenu(graph);
                 });
-                break;
+                
             case "2":
                 rl.question("Введите имя вершины: ", (vertex) => {
                     graph.deleteVertex(vertex);
-                    console.log(`Вершина ${vertex} и её ребра удалены.`);
                     editGraphMenu(graph); // Возвращаемся в меню
                 });
                 break;
+               
             case "3":
-                if (graph.constructor.name === "UndirectedUnweightedGraph") {
-                    rl.question("Введите вершины через пробел (v1 v2): ", (input) => {
-                        const [v1, v2] = input.split(" ");
-                        graph.addUndirectedEdgeNonWeight(v1, v2);
-                        editGraphMenu(graph);
-                    });
-                } else if (graph.constructor.name === "UndirectedWeightedGraph") {
-                    rl.question("Введите вершины и вес через пробел (v1 v2 вес): ", (input) => {
-                        const [v1, v2, weight] = input.split(" ");
-                        graph.addUndirectedEdge(v1, v2, parseFloat(weight));
-                        editGraphMenu(graph);
-                    });
-                } else if (graph.constructor.name === "DirectedUnweightedGraph") {
-                    rl.question("Введите вершины и вес через пробел (v1 v2 вес): ", (input) => {
-                        const [v1, v2] = input.split(" ");
-                        graph.addDirectedEdgeNonWeight(v1, v2);
-                        editGraphMenu(graph);
-                    });
-                } else if (graph.constructor.name === "DirectedWeightedGraph") {
-                    rl.question("Введите вершины и вес через пробел (v1 v2 вес): ", (input) => {
-                        const [v1, v2, weight] = input.split(" ");
-                        graph.addDirectedEdge(v1, v2, parseFloat(weight));
-                        editGraphMenu(graph);
-                    });
-                }
-                case "4":
+                rl.question("Введите вершины и вес, если у вас взвешанный граф через пробел: ", (input) => {
+                    try {
+                        const inputs = input.split(" ");
+                        const [v1, v2, weight] = inputs;
+            
+                        if (!v1 || !v2) {
+                            throw new Error("Ошибка: необходимо ввести минимум две вершины (v1 v2).");
+                        }
+            
+                        switch (graph.constructor.name) {
+                            case "UndirectedUnweightedGraph":
+                                graph.addUndirectedEdgeNonWeight(v1, v2);
+                                break;
+            
+                            case "UndirectedWeightedGraph":
+                                if (!weight) throw new Error("Ошибка: необходимо ввести вес для взвешенного графа.");
+                                graph.addUndirectedEdge(v1, v2, parseFloat(weight));
+                                break;
+            
+                            case "DirectedUnweightedGraph":
+                                graph.addDirectedEdgeNonWeight(v1, v2);
+                                break;
+            
+                            case "DirectedWeightedGraph":
+                                if (!weight) throw new Error("Ошибка: необходимо ввести вес для взвешенного графа.");
+                                graph.addDirectedEdge(v1, v2, parseFloat(weight));
+                                break;
+            
+                            default:
+                                throw new Error("Неизвестный тип графа.");
+                        }
+                    } 
+                    catch (error) { console.error(error.message); } 
+                    finally { editGraphMenu(graph);}
+                });
+            break;
+            case "4":
                 if (graph.constructor.name === "UndirectedUnweightedGraph") {
                     rl.question("Введите вершины через пробел (v1 v2): ", (input) => {
                         const [v1, v2] = input.split(" ");
@@ -437,26 +220,26 @@ function editGraphMenu(graph) {
                     });
                 }
                 break;
-                case "5":
-                    graph.printGraph();
-                    editGraphMenu(graph);
-                    break;
-                case "6":
-                    saveGraph(graph);
-                    break;
-                case "7":
-                    console.log("Переходим к заданиям...");
-                    zadaniya(graph);
-                    break;
-                case "8":
-                    console.log("Переходим к заданиям...");
-                    testgraph(graph);
-                    break;
-                case "9":
-                    console.log("Выход из редактирования графа.");
-                    rl.close();
-                    break;
-                default:
+            case "5":
+                graph.printGraph();
+                editGraphMenu(graph);
+                break;
+            case "6":
+                saveGraph(graph);
+                break;
+            case "7":
+                console.log("Переходим к заданиям...");
+                zadaniya(graph);
+                break;
+            case "8":
+                console.log("Переходим к заданиям...");
+                testgraph(graph);
+                break;
+            case "9":
+                console.log("Выход из редактирования графа.");
+                rl.close();
+                break;
+            default:
                     console.log("Неверный выбор.");
                     editGraphMenu(graph);
                     break;
@@ -520,5 +303,3 @@ function zadaniya(graph) {
         }  
     });
 }
-
-
