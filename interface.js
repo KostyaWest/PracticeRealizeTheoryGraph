@@ -290,13 +290,6 @@ function testgraph(graph){
     } catch (error) {
         console.log(`Ошибка при выводе графа: ${error.message}`);
     }
-    //8. Принт графа
-    try {
-        graph.printGraph();
-        console.log("принт графа.");
-    } catch (error) {
-        console.log(`Ошибка при выводе графа: ${error.message}`);
-    }
     //2-е задание
     try {
         graph.printGraph();
