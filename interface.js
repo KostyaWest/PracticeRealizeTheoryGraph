@@ -121,6 +121,9 @@ function showMainMenu() {
     });
 }
 
+
+
+
 // Функция для выбора и загрузки графа
 async function loadGraph() {
     rl.question('Введите название файла: ', async (fileName) => {
@@ -174,6 +177,175 @@ function createNewGraph() {
     });
 }
 
+//тотальный тест
+function testgraph(graph){
+    console.log("=======================================");
+    console.log("    Тестирование операций с графом    ");
+    console.log("=======================================\n");
+    // 1. Добавление узла
+    try {
+        const testNode = "testuzel";
+        graph.addVertex(testNode);
+        console.log(`Узел "${testNode}" успешно добавлен.`);
+    } catch (error) {
+        console.log(`Ошибка при добавлении узла: ${error.message}`);
+    }
+    try {
+        const testNode = "testuzel2";
+        graph.addVertex(testNode);
+        console.log(`Узел "${testNode}" успешно добавлен.`);
+    } catch (error) {
+        console.log(`Ошибка при добавлении узла: ${error.message}`);
+    }
+    try {
+        const testNode = "testuzel3";
+        graph.addVertex(testNode);
+        console.log(`Узел "${testNode}" успешно добавлен.`);
+    } catch (error) {
+        console.log(`Ошибка при добавлении узла: ${error.message}`);
+    }
+    try {
+        const testNode = "testuzel4";
+        graph.addVertex(testNode);
+        console.log(`Узел "${testNode}" успешно добавлен.`);
+    } catch (error) {
+        console.log(`Ошибка при добавлении узла: ${error.message}`);
+    }
+    // 2. Добавление петли
+    try {
+        graph.addUndirectedEdge("testuzel", "testuzel", 12);
+        console.log("Петля addUndirectedEdge для узла 'testuzel' успешно добавлена.");
+    } catch (error) {
+        console.log(`Ошибка addUndirectedEdge при добавлении петли: ${error.message}`);
+    }
+    try {
+        graph.addDirectedEdgeNonWeight("testuzel", "testuzel");
+        console.log("Петля addDirectedEdgeNonWeight для узла 'testuzel' успешно добавлена.");
+    } catch (error) {
+        console.log(`Ошибка addUndirectedEdge при добавлении петли: ${error.message}`);
+    }
+    try {
+        graph.addDirectedEdge("testuzel", "testuzel", 12);
+        console.log("Петля addDirectedEdge для узла 'testuzel' успешно добавлена.");
+    } catch (error) {
+        console.log(`Ошибка addUndirectedEdge при добавлении петли: ${error.message}`);
+    }
+    try {
+        graph.addUndirectedEdgeNonWeight("testuzel", "testuzel");
+        console.log("Петля addDirectedEdge для узла 'testuzel' успешно добавлена.");
+    } catch (error) {
+        console.log(`Ошибка addUndirectedEdge при добавлении петли: ${error.message}`);
+    }
+    // 3. Добавление одних и тех же ребер рёбер без веса
+    try {
+        graph.addUndirectedEdgeNonWeight("testuzel", "testuzel2");
+        //console.log("Неориентированое невзвешенное ребро между узлами testuzel и testuzel2 успешно добавлено.");
+    } catch (error) {
+        console.log(`Ошибка при добавлении рёбер без веса: ${error.message}`);
+    }
+    try {
+        graph.addDirectedEdgeNonWeight("testuzel", "testuzel2");
+       // console.log("Ориентированое невзвешенное Ребро без веса между testuzel и testuzel2 успешно добавлено.");
+    } catch (error) {
+        console.log(`Ошибка при добавлении рёбер без веса: ${error.message}`);
+    }
+    // 4. Добавление рёбер с весом
+    try {
+        graph.addUndirectedEdge("testuzel2", "testuzel3", 5);
+       // console.log("Ребро с весом между testuzel2 и testuzel3 успешно добавлено.");
+    } catch (error) {
+        console.log(`Ошибка при добавлении рёбер с весом: ${error.message}`);
+    }
+    try {
+        graph.addDirectedEdge("testuzel2", "testuzel3", 5);
+      //  console.log("Ребро с весом между testuzel2 и testuzel3 успешно добавлено.");
+    } catch (error) {
+        console.log(`Ошибка при добавлении рёбер с весом: ${error.message}`);
+    }
+    // 5. Удаление ребра
+    try {
+        graph.deleteUndirectedEdge("testuzel2", "testuzel3");
+        console.log("Петля для узла 'testuzel' успешно удалена.");
+    } catch (error) {
+        console.log(`Ошибка при удалении петли: ${error.message}`);
+    }
+    // 6. Удаление петли
+    try {
+        graph.deleteUndirectedEdge("testuzel", "testuzel");
+        console.log("Петля для узла 'testuzel' успешно удалена.");
+    } catch (error) {
+        console.log(`Ошибка при удалении петли: ${error.message}`);
+    }
+     //7. Удаление узла
+     try {
+        graph.deleteVertex("testuzel");
+        console.log("Узел 'testuzel' успешно удалён.");
+    } catch (error) {
+        console.log(`Ошибка при удалении узла: ${error.message}`);
+    }
+    //8. Принт графа
+    try {
+        graph.printGraph();
+        console.log("принт графа.");
+    } catch (error) {
+        console.log(`Ошибка при выводе графа: ${error.message}`);
+    }
+    //8. Принт графа
+    try {
+        graph.printGraph();
+        console.log("принт графа.");
+    } catch (error) {
+        console.log(`Ошибка при выводе графа: ${error.message}`);
+    }
+    //2-е задание
+    try {
+        graph.printGraph();
+        console.log("принт графа.");
+    } catch (error) {
+        console.log(`Ошибка при выводе графа: ${error.message}`);
+    }
+    try {
+        if ((graph.constructor.name === "DirectedUnweightedGraph") || (graph.constructor.name === "DirectedWeightedGraph")) {
+            const vertices = graph.findVerticesWithHigherOutDegree();
+            if (vertices.length) {
+                console.log("Вершины с полустепенью исхода больше полустепени захода:", vertices.join(", "));
+            } else {
+                console.log("Таких вершин нет.");
+            }
+        } else {
+            console.log("Ошибка: Эта задача применима только для ориентированных графов, поскольку в ориентированном графе у рёбер есть направление.");
+        }
+    } catch (error) {
+        console.log(`Ошибка при выполнении задания 1: ${error.message}`);
+    }
+    // 9. Задание 2 (Вычисление степеней для всех вершин)
+    try {
+        graph.calculateDegree();
+        console.log("Степени всех вершин успешно вычислены.");
+    } catch (error) {
+        console.log(`Ошибка при вычислении степеней: ${error.message}`);
+    }
+
+    try {
+        // 10. Задание 3 (Обращение графа для ориентированных графов)
+        if ((graph.constructor.name === "DirectedUnweightedGraph") || (graph.constructor.name === "DirectedWeightedGraph")) {
+            const reversedGraph = graph.reverseGraph();
+            console.log("Структура обращённого графа:");
+            console.log(reversedGraph.adjacencyList);
+        } else {
+            console.log("Ошибка: Эта задача применима только для ориентированных графов.");
+        }
+    } catch (error) {
+        console.log(`Ошибка при выполнении задания 3: ${error.message}`);
+    }
+    
+  
+
+    console.log("\n=======================================");
+    console.log("          Тестирование завершено       ");
+    console.log("=======================================\n");
+}
+
 function editGraphMenu(graph) {
     printGraphType(graph);
     console.log("Выберите действие с графом:");
@@ -196,7 +368,8 @@ function editGraphMenu(graph) {
     console.log("5. Печать графа");
     console.log("6. Сохранить граф в файл");
     console.log("7. Перейти к заданиям");
-    console.log("8. Завершить редактирование");
+    console.log("8. Провести большое тестирование");
+    console.log("9. Завершить редактирование");
 
     rl.question("Выберите действие: ", (choice) => {
         switch (choice) {
@@ -283,6 +456,10 @@ function editGraphMenu(graph) {
                     zadaniya(graph);
                     break;
                 case "8":
+                    console.log("Переходим к заданиям...");
+                    testgraph(graph);
+                    break;
+                case "9":
                     console.log("Выход из редактирования графа.");
                     rl.close();
                     break;
