@@ -200,31 +200,29 @@ class Graph {
 
     const dfs = (vertex, path) => {
         visited.add(vertex);
-        paths[vertex] = path;
+        paths[vertex] = path.slice(1); // Исключаем саму вершину
 
-        for (const neighbor of reversedGraph.adjacencyList[vertex]) {
-            if (!visited.has(neighbor.node)) {
-                dfs(neighbor.node, [neighbor.node, ...path]); // Передаём новый путь
-            }
+      
+      for (const neighbor of reversedGraph.adjacencyList[vertex]) {
+        if (!visited.has(neighbor.node)) {
+            dfs(neighbor.node, [neighbor.node, ...path]); // Передаём новый путь
         }
-    };
+      }
+    }; 
+  
+   // Запускаем DFS из целевой вершины
+   dfs(targetVertex, [targetVertex]);
 
-    // Запускаем DFS из целевой вершины
-    dfs(targetVertex, [targetVertex]);
-
-    // Удаляем целевую вершину из результата
-    delete paths[targetVertex];
+   // Удаляем целевую вершину из результата
+   delete paths[targetVertex];
 
     // Выводим результат
     console.log(`Вершины и пути, из которых существует путь в "${targetVertex}":`);
-    for (const vertex in paths) {
-        console.log(`${vertex} -> ${paths[vertex].join(" -> ")}`);
-    }
-
+    for (const vertex in paths) { console.log(`${vertex} -> ${paths[vertex].join(" -> ")}`); }
     return paths;
 }
 
-  //путь А-Б. пятое задание. Обход в ширину
+//путь А-Б. пятое задание. Обход в ширину
   isReachableFrom(vertex) {
     const visited = new Set();
     const queue = [[vertex, [vertex]]]; // Используем очередь вместо стека
