@@ -47,7 +47,6 @@ class Graph {
         }
       }
     }
-
     return edges;
   }
 
@@ -287,12 +286,57 @@ class Graph {
     return null;
   }
 
+  // Седьмое задание. Алгоритм Краскала (НВГ)
+  kruskalMST() {
+    const edges = [];
+    for (const vertex in this.adjacencyList) {
+        for (const { node, weight } of this.adjacencyList[vertex]) {
+            if (vertex < node) { // Чтобы избежать дубликатов в неориентированном графе
+                edges.push({ vertex1: vertex, vertex2: node, weight });
+            }
+        }
+    }
+    
+    edges.sort((a, b) => a.weight - b.weight);
+    
+    const parent = {};
+    const rank = {};
+    
+    const find = (v) => {
+        if (parent[v] !== v) parent[v] = find(parent[v]);
+        return parent[v];
+    };
+    
+    const union = (v1, v2) => {
+        const root1 = find(v1);
+        const root2 = find(v2);
+        if (root1 !== root2) {
+            if (rank[root1] > rank[root2]) {
+                parent[root2] = root1;
+            } else if (rank[root1] < rank[root2]) {
+                parent[root1] = root2;
+            } else {
+                parent[root2] = root1;
+                rank[root1] += 1;
+            }
+        }
+    };
+    
+    for (const vertex in this.adjacencyList) {
+        parent[vertex] = vertex;
+        rank[vertex] = 0;
+    }
+    
+    const mst = [];
+    for (const { vertex1, vertex2, weight } of edges) {
+      if (find(vertex1) !== find(vertex2)) {
+          union(vertex1, vertex2);
+          mst.push({ vertex1, vertex2, weight });
+      }
+    }
+    return mst;
+  };
 }
-          
-
-
-
-
 
 //фабрика графов
 class GraphFactory {
