@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { GraphFactory, Graph } = require('./graphmethods');
+const { GraphFactory, Graph } = require('./graphmethods').default;
 
 function validateAdjacencyList(adjacencyList) {
     // Проверяем, что adjacencyList - это объект

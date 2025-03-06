@@ -1,7 +1,7 @@
 const readline = require('readline');
 const fs = require('fs');
 const path = require('path');
-const { GraphFactory, Graph } = require('./graphmethods');
+const { GraphFactory, Graph } = require('./graphmethods').default;
 const { saveGraphToFile, loadGraphFromFile, testgraph, printGraphType, testFiles, testBrokenGraphs } = require('./app');
 const rl = readline.createInterface({
     input: process.stdin,
@@ -317,16 +317,17 @@ function zadaniya(graph) {
                         console.log("Ошибка: Эта задача применима только для ориентированных графов.");
                         zadaniya(graph);
                     }
-                    case "6":
-                    if (graph.constructor.name === "UndirectedWeightedGraph") {
-                        const mst = graph.kruskalMST();
-                        console.log("Минимальное остовное дерево (MST):", mst);
-                        zadaniya(graph);
-                    } else {
-                        console.log("Ошибка: Алгоритм Краскала применяется только для неориентированных взвешенных графов. Иначе, проверьте структуру графа");
-                        zadaniya(graph);
-                    }
-                    break;
+                break;
+                case "6":
+                if (graph.constructor.name === "UndirectedWeightedGraph") {
+                    const mst = graph.kruskalMST();
+                    console.log("Минимальное остовное дерево (MST):", mst);
+                    zadaniya(graph);
+                } else {
+                    console.log("Ошибка: Алгоритм Краскала применяется только для неориентированных взвешенных графов. Иначе, проверьте структуру графа");
+                    zadaniya(graph);
+                }
+                break;
                 case "7":
                     console.log("пусто");
                     break;

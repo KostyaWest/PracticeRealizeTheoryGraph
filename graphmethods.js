@@ -1,5 +1,10 @@
+import { saveGraphToFile, loadGraphFromFile } from './app.js'; // добавьте .js, если это не TypeScript
+
+
 class Graph {
   constructor() {this.adjacencyList = {};}
+
+  // Граф хранится как adjacencyList
   
   // Конструктор-копия
   constructorCopy(originalGraph) {this.adjacencyList = JSON.parse(JSON.stringify(originalGraph.adjacencyList));}
@@ -98,9 +103,17 @@ class Graph {
     if (!isDirected && !isWeighted) return "UndirectedUnweightedGraph";
   }
 
+  // -----------------------------------------------------------------
   //полустепени. второе задание
+
+  // Теоретическая информация:
+  // Полустепени считаются только для ориентированых графов
+  // Полустепень исхода (Out-degree) - кол-во ребер выходящих из вершины
+  // Полустепень захода (In-degree) - кол-во ребер входящих в вершину
+  // Моя функция выполняет поиск вершин Out-degree > In-degree
+
   findVerticesWithHigherOutDegree() {
-    const inDegrees = {}; 
+    const inDegrees = {}; //хранение входящих ребер
     const result = [];
 
     // Инициализация входящих степеней
@@ -128,8 +141,17 @@ class Graph {
     return result;
   }
 
+  // -----------------------------------------------------------------
   //степени. третье задание
+
+  // Теоретическая информация:
+  // Степень вершины графа — это количество рёбер, связанных с этой вершиной.
+  // В неориент графе Степень вершины - кол-во соседей (сколько ребер соединяется с вершиной)
+  // В ориент графе (выше) есть полустепени захода и исхода. Их сумма будет степенью
+  
   calculateDegree() {
+    // const степени
+    // const кол-во входяших ребер для каждой вершины
     const degrees = {};
     const inDegrees = {};
 
@@ -148,6 +170,8 @@ class Graph {
     const graphType = this.determineGraphType(); // Определяем тип графа один раз
 
     // Подсчёт степеней
+    // Граф ориентированый ->  in-degree + out, 
+    // иначе -> сумма in-degree+out/2 т.к. ребро учитывается дважды (для каждой вершины инцидентного ребра)
     for (const vertex in this.adjacencyList) {
         const outDegree = this.adjacencyList[vertex]?.length || 0;
         const inDegree = inDegrees[vertex];
@@ -159,18 +183,25 @@ class Graph {
     return degrees;
   }
 
+  // -----------------------------------------------------------------
   //реверсграф. четвертое задание
+  
+  // Теоретическая информация:
+  // Reversegraph - граф наоборот. Было A -> B, стало B -> A. 
+  // Работает только для орт графа, т.к. в неориентированом графе реверс граф такой же как и обычный
+  
   reverseGraph() {
-    const reversedGraph = new this.constructor(); 
+    const reversedGraph = new this.constructor(); // Создается пустой граф того же класса что и исходный
 
     // Добавляем все вершины
-    for (const vertex in this.adjacencyList) {
-        reversedGraph.adjacencyList[vertex] = [];
-    }
+    for (const vertex in this.adjacencyList) {      // Перебирает все вершины vertex и 
+        reversedGraph.adjacencyList[vertex] = [];   // создаёт для них пустые списки смежности 
+    }                                               // в reversedGraph
 
     // Определяем метод добавления рёбер
-    const isWeighted = this.constructor.name === "DirectedWeightedGraph";
-    const addEdge = isWeighted 
+    const isWeighted = this.constructor.name === "DirectedWeightedGraph"; // Проверка на вес
+
+    const addEdge = isWeighted                      // Метод добавления ребер в зависимости от типа графа
         ? (u, v, weight) => reversedGraph.addDirectedEdge(v, u, weight)
         : (u, v) => reversedGraph.addDirectedEdgeNonWeight(v, u);
 
@@ -183,8 +214,22 @@ class Graph {
     return reversedGraph;
   }
 
+  // -----------------------------------------------------------------
   //поиск к узлу. Шестое задание
-  findVerticesWithPathTo(targetVertex) {
+
+  // Теоретическая информация:
+  // Нахождение всех вершин и путей из которых можно попасть в узел 
+  // Работает только для орт графа, т.к. в неориентированом графе реверс граф такой же как и обычный
+  
+  // dfs - обход в глубину алгоритм
+  // Выбираем первую вершину и посещаем как посещенную
+  // Выбираем смежную вершину к посещенной, проходим в глубь. Отмечаем её посещенной
+
+  // Посещаем вершину и посещаем соседа (обход в глубь) (рекурсия)
+  // помечаем (опционально), что посетили вершину и прошли её
+  // Если уперлись и соседей нет, то окрашиваем вершину/иной способ взаимодействия/ и возвращаемся обратно
+
+  findVerticesWithPathTo(targetVertex) { // Существует ли вершина?
     if (!this.adjacencyList[targetVertex]) {
         console.log(`Вершина "${targetVertex}" отсутствует в графе.`);
         return {};
@@ -194,12 +239,12 @@ class Graph {
     const reversedGraph = this.reverseGraph();
 
     // Обход в глубину с сохранением путей
-    const visited = new Set();
-    const paths = {}; // Хранение путей к целевой вершине
+    const visited = new Set();            // Мн-во посещенных вершин (от зацикливания)
+    const paths = {};                     // Хранение путей к целевой вершине
 
     const dfs = (vertex, path) => {
         visited.add(vertex);
-        paths[vertex] = path.slice(1); // Исключаем саму вершину
+        paths[vertex] = path.slice(1);    // Исключаем саму вершину
 
       
       for (const neighbor of reversedGraph.adjacencyList[vertex]) {
@@ -207,8 +252,8 @@ class Graph {
             dfs(neighbor.node, [neighbor.node, ...path]); // Передаём новый путь
         }
       }
-    }; 
-  
+    }; //рекурсивно обходит соседние вершины реверсграфа. Удаляет саму вершину что бы убрать дубликат
+
    // Запускаем DFS из целевой вершины
    dfs(targetVertex, [targetVertex]);
 
@@ -219,26 +264,41 @@ class Graph {
     console.log(`Вершины и пути, из которых существует путь в "${targetVertex}":`);
     for (const vertex in paths) { console.log(`${vertex} -> ${paths[vertex].join(" -> ")}`); }
     return paths;
-}
+  }
 
-//путь А-Б. пятое задание. Обход в ширину
+  // -----------------------------------------------------------------
+  //путь А-Б. пятое задание. Обход в ширину
+
+  // Теоретическая информация:
+  // Этот метод ищет пути ко всем вершинам, достижимым из vertex, 
+  // используя обход в ширину (BFS).
+  // Только для ацикличного ортграфа
+  // Нужно найти такую вершину u, из которой можно добраться до всех остальных
+  
+  // bfs - обход в ширину алгоритм, описан явно
+  // Всем вершинам графа присваивается значение не посещённой. Выбирается первая вершина и помечается как посещённая и заносится в очередь.
+  // Посещается первая вершина из очереди (если она не помечена как посещённая). Все её соседние вершины заносятся в очередь. После этого она удаляется из очереди.
+  // Повторяется шаг 2 до тех пор, пока очередь не станет пустой.
+  
   isReachableFrom(vertex) {
     const visited = new Set();
-    const queue = [[vertex, [vertex]]]; // Используем очередь вместо стека
+    const queue = [[vertex, [vertex]]]; // Очередь BFS [Текущая вершина, путь к ней]
     const paths = {}; // Объект для хранения путей
 
+    // Основной цикл BFS
     while (queue.length) {
         const [current, path] = queue.shift(); // Берём из начала очереди
 
-        if (!visited.has(current)) {
+        if (!visited.has(current)) { // Если вершина не посещена, то добавляется в множество visited 
             visited.add(current);
 
-            // Добавляем путь только если текущая вершина не совпадает с начальной
+            // Если вершина не является начальной, добавляется путь к этой вершине в объект paths
             if (current !== vertex) {
                 paths[current] = path;
             }
 
-            const neighbors = this.adjacencyList[current] || [];
+            // Обход соседей
+            const neighbors = this.adjacencyList[current] || []; // Соседи берутся из списка смежности
             for (const neighborObj of neighbors) {
                 const neighbor = neighborObj.node;
 
@@ -263,6 +323,8 @@ class Graph {
     // Граф имеет корень, если количество посещённых вершин равно количеству всех вершин
     return visited.size === Object.keys(this.adjacencyList).length;
   }
+
+  // Этот метод ищет корень графа.
   findRoot() {
     if (!Object.keys(this.adjacencyList).length) {
         console.log("Граф пустой. Корень отсутствует.");
@@ -286,56 +348,139 @@ class Graph {
     return null;
   }
 
+  // -----------------------------------------------------------------
   // Седьмое задание. Алгоритм Краскала (НВГ)
+
+  // Теоретическая информация:
+  // Минимальное оставное дерево - дерево графа имеющее минимальный возможный вес и объединяющее все вершины
+  // Алгоритм:
+  // Сортируем рёбра по весу, добавляем самое легкое в оставное дерево
+  // Последовательно добавляем рёбра в минимальное остовное дерево (MST), проверяя, не образуют ли они цикл (для этого используется структура данных Union-Find).
+  // Продолжаем, пока не получим  V -1 ребер (V - число вершин)
+
+  // Структура Union - Find
+  // Find (Поиск): Определяет, к какому множеству принадлежит элемент.
+  // Помогает проверить, образуют ли два элемента цикл
+  // Union (Объединение): Объединяет два множества в одно.
+  // Это делается, когда два элемента принадлежат разным множествам, и нужно объединить их в одно множество.
+  // Каждый элемент хранит ссылку на роодителя и сам является предком
+  // При объединии двух множеств, один из корней становится родителем другого. Чтобы сохранить структуру сбалансированной и ускорить операции, используют ранги (или глубину деревьев).
+
+  // kruskalMST() {
+  //   const edges = [];                                                 // Массив с ребрами
+  //   for (const vertex in this.adjacencyList) {
+  //       for (const { node, weight } of this.adjacencyList[vertex]) {
+  //           if (vertex < node) {                                      // Проверка на дубликаты ребер (для неориентированого графа)
+  //               edges.push({ vertex1: vertex, vertex2: node, weight });
+  //           }
+  //       }
+  //   }
+    
+  //   edges.sort((a, b) => a.weight - b.weight);                        // Сортировка ребер по возрастанию
+    
+  //   const parent = {};                                                //родитель
+  //   const rank = {};                                                  //глубина дерева (станет родителем)
+    
+  //   const find = (v) => {                                             // Эта функция находит корень (или представителя) компоненты связности для узла. Если текущий узел 
+  //       if (parent[v] !== v) parent[v] = find(parent[v]);             // не является своим собственным родителем, то рекурсивно находим родителя, пока не дойдем до корня
+  //       return parent[v];                                             //
+  //   };
+    
+  //   const union = (v1, v2) => {                                       // Эта функция объединяет два множества (дерева) в одно. 
+  //       const root1 = find(v1);
+  //       const root2 = find(v2);
+  //       if (root1 !== root2) {
+  //           if (rank[root1] > rank[root2]) {
+  //               parent[root2] = root1;
+  //           } else if (rank[root1] < rank[root2]) {
+  //               parent[root1] = root2;
+  //           } else {
+  //               parent[root2] = root1;
+  //               rank[root1] += 1;
+  //           }
+  //       }
+  //   };
+    
+  //   for (const vertex in this.adjacencyList) {
+  //       parent[vertex] = vertex;
+  //       rank[vertex] = 0;
+  //   }
+    
+  //   const mst = [];                                                   // Основная функция mst
+  //   for (const { vertex1, vertex2, weight } of edges) {               // Для каждого отсортированного ребра 
+  //     if (find(vertex1) !== find(vertex2)) {                          // Проверяется, принадлежат ли вершины рёбра разным компонентам (с помощью find).
+  //         union(vertex1, vertex2);                                    // Если это так, ребро добавляется в список минимального остовного дерева (mst), и вершины соединяются (с помощью union).
+  //         mst.push({ vertex1, vertex2, weight });
+  //     }
+  //   }
+  //   return mst;
+  //   // Создаю граф
+  // };
   kruskalMST() {
-    const edges = [];
-    for (const vertex in this.adjacencyList) {
-        for (const { node, weight } of this.adjacencyList[vertex]) {
-            if (vertex < node) { // Чтобы избежать дубликатов в неориентированном графе
-                edges.push({ vertex1: vertex, vertex2: node, weight });
-            }
-        }
-    }
-    
-    edges.sort((a, b) => a.weight - b.weight);
-    
+    const edges = this.toEdgeList(); // Получаем список рёбер
+    edges.sort((a, b) => a.weight - b.weight); // Сортируем по весу
+
+    const newGraph = new this.constructor(); // Создаём новый граф того же типа
+    const graphType = this.determineGraphType(); // Определяем тип графа
+
+    console.log(`Тип графа: ${graphType}`);
+
     const parent = {};
-    const rank = {};
-    
-    const find = (v) => {
-        if (parent[v] !== v) parent[v] = find(parent[v]);
-        return parent[v];
-    };
-    
-    const union = (v1, v2) => {
-        const root1 = find(v1);
-        const root2 = find(v2);
-        if (root1 !== root2) {
-            if (rank[root1] > rank[root2]) {
-                parent[root2] = root1;
-            } else if (rank[root1] < rank[root2]) {
-                parent[root1] = root2;
-            } else {
-                parent[root2] = root1;
-                rank[root1] += 1;
+    const find = (vertex) => (parent[vertex] === vertex ? vertex : (parent[vertex] = find(parent[vertex])));
+    const union = (v1, v2) => (parent[find(v1)] = find(v2));
+
+    // Инициализируем вершины
+    for (const vertex in this.adjacencyList) {
+        newGraph.addVertex(vertex);
+        parent[vertex] = vertex;
+    }
+
+    // Обход рёбер и построение минимального остовного дерева
+    for (const { from, to, weight } of edges) {
+        if (find(from) !== find(to)) {
+            union(from, to);
+            console.log(`Добавляю ребро ${from} - ${to} (вес: ${weight})`);
+
+            // Выбираем правильный метод добавления рёбер
+            switch (graphType) {
+                case "UndirectedUnweightedGraph":
+                    newGraph.addUndirectedEdgeNonWeight(from, to);
+                    break;
+                case "UndirectedWeightedGraph":
+                    newGraph.addUndirectedEdge(from, to, weight);
+                    break;
+                case "DirectedUnweightedGraph":
+                    newGraph.addDirectedEdgeNonWeight(from, to);
+                    break;
+                case "DirectedWeightedGraph":
+                    newGraph.addDirectedEdgeWeight(from, to, weight);
+                    break;
+                default:
+                    throw new Error("Неподдерживаемый тип графа");
             }
         }
+    }
+
+    // Преобразование в формат, подходящий для сохранения
+    const formattedAdjacencyList = {};
+    for (const vertex in newGraph.adjacencyList) {
+        formattedAdjacencyList[vertex] = newGraph.adjacencyList[vertex].map(edge => {
+            return {
+                node: edge.to,
+                weight: edge.weight || null // Для невзвешенных рёбер вес может быть null
+            };
+        });
+    }
+
+    // Создаём объект для возвращения, который будет сохранён в файл
+    const result = {
+        adjacencyList: formattedAdjacencyList
     };
-    
-    for (const vertex in this.adjacencyList) {
-        parent[vertex] = vertex;
-        rank[vertex] = 0;
-    }
-    
-    const mst = [];
-    for (const { vertex1, vertex2, weight } of edges) {
-      if (find(vertex1) !== find(vertex2)) {
-          union(vertex1, vertex2);
-          mst.push({ vertex1, vertex2, weight });
-      }
-    }
-    return mst;
-  };
+
+    console.log("Минимальное остовное дерево:", JSON.stringify(result.adjacencyList, null, 2));
+
+    return result; // Возвращаем результат в нужном формате
+}
 }
 
 //фабрика графов
@@ -413,7 +558,8 @@ class UndirectedUnweightedGraph extends Graph {
     this.adjacencyList[vertex2].push({ node: vertex1});
     // console.log(`Неориентированное невзвешенное ребро между ${vertex1} и ${vertex2} добавлено.`);
   }
-
+  
+  // Добавить проверку на ребро
   deleteUndirectedEdgeNonWeight(vertex1, vertex2) {
       // Проверяем существование вершин
       if (!this.adjacencyList[vertex1]) {
@@ -620,4 +766,4 @@ class DirectedWeightedGraph extends Graph {
 // <---------------------------------------------------------------------------------------------------------------------------------------------------------->  
 
 // Экспортируем нужные классы
-module.exports = { GraphFactory, Graph };
+export default { GraphFactory, Graph };
