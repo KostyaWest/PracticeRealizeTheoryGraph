@@ -384,6 +384,40 @@ class Graph {
     }
     return mstGraph;
   }
+
+// Восьмое задание Найти количество кратчайших путей от u до каждой вершины. Алгоритм Дейкстры
+dijkstra(start) {
+  let distances = {};
+  let previous = {};
+  let queue = new Map();
+
+  // Инициализация
+  for (let vertex in this.adjacencyList) {
+      distances[vertex] = Infinity;
+      previous[vertex] = null;
+      queue.set(vertex, Infinity);
+  }
+  distances[start] = 0;
+  queue.set(start, 0);
+
+  while (queue.size > 0) {
+      // Выбираем вершину с минимальным расстоянием
+      let [current] = [...queue.entries()].sort((a, b) => a[1] - b[1]);
+      queue.delete(current);
+
+      // Перебираем соседей
+      for (let neighbor of this.adjacencyList[current]) {
+          let alt = distances[current] + neighbor.weight;
+          if (alt < distances[neighbor.node]) {
+              distances[neighbor.node] = alt;
+              previous[neighbor.node] = current;
+              queue.set(neighbor.node, alt);
+          }
+      }
+  }
+
+  return { distances, previous };
+}
 }
 
 // DSU (Find-Union) для обработки компонент

@@ -359,9 +359,36 @@ function zadaniya(graph) {
                 }
                 break;
                 case "7":
-                    console.log("пусто");
-                    zadaniya(graph);
-                    break;
+                    case "8":
+                        if (graph.constructor.name !== "DirectedWeightedGraph") {
+                            console.log("Ошибка: Алгоритм Дейкстры применяется только для ориентированных взвешенных графов.");
+                            zadaniya(graph);
+                            return;
+                        }
+                    
+                        // Проверяем, есть ли отрицательные рёбра
+                        if (graph.toEdgeList().some(edge => edge.weight < 0)) {
+                            console.log("Ошибка: Алгоритм Дейкстры не работает с отрицательными рёбрами!");
+                            zadaniya(graph);
+                            return;
+                        }
+                    
+                        rl.question("Введите начальную вершину: ", (start) => {
+                            if (!(start in graph.adjacencyList)) {
+                                console.log("Ошибка: Вершина не найдена!");
+                                zadaniya(graph);
+                                return;
+                            }
+                    
+                            let result = graph.dijkstra(start);
+                            console.log("\nКратчайшие расстояния от", start, ":");
+                            for (let vertex in result.distances) {
+                                console.log(`${start} -> ${vertex}: ${result.distances[vertex]}`);
+                            }
+                    
+                            zadaniya(graph);
+                        });
+                        break;
                 case "8":
                     console.log("пусто");
                     zadaniya(graph);
