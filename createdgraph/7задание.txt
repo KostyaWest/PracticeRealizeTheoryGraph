@@ -1,0 +1,68 @@
+{
+  "A": [
+    {
+      "node": "B",
+      "weight": 1
+    },
+    {
+      "node": "C",
+      "weight": 5
+    }
+  ],
+  "B": [
+    {
+      "node": "A",
+      "weight": 1
+    },
+    {
+      "node": "C",
+      "weight": 3
+    },
+    {
+      "node": "D",
+      "weight": 4
+    }
+  ],
+  "C": [
+    {
+      "node": "A",
+      "weight": 5
+    },
+    {
+      "node": "B",
+      "weight": 3
+    },
+    {
+      "node": "D",
+      "weight": 2
+    },
+    {
+      "node": "E",
+      "weight": 6
+    }
+  ],
+  "D": [
+    {
+      "node": "C",
+      "weight": 2
+    },
+    {
+      "node": "B",
+      "weight": 4
+    },
+    {
+      "node": "E",
+      "weight": 7
+    }
+  ],
+  "E": [
+    {
+      "node": "C",
+      "weight": 6
+    },
+    {
+      "node": "D",
+      "weight": 7
+    }
+  ]
+}

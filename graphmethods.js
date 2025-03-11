@@ -1,6 +1,3 @@
-import { saveGraphToFile, loadGraphFromFile } from './app.js'; // добавьте .js, если это не TypeScript
-
-
 class Graph {
   constructor() {this.adjacencyList = {};}
 
@@ -365,122 +362,67 @@ class Graph {
   // Это делается, когда два элемента принадлежат разным множествам, и нужно объединить их в одно множество.
   // Каждый элемент хранит ссылку на роодителя и сам является предком
   // При объединии двух множеств, один из корней становится родителем другого. Чтобы сохранить структуру сбалансированной и ускорить операции, используют ранги (или глубину деревьев).
-
-  // kruskalMST() {
-  //   const edges = [];                                                 // Массив с ребрами
-  //   for (const vertex in this.adjacencyList) {
-  //       for (const { node, weight } of this.adjacencyList[vertex]) {
-  //           if (vertex < node) {                                      // Проверка на дубликаты ребер (для неориентированого графа)
-  //               edges.push({ vertex1: vertex, vertex2: node, weight });
-  //           }
-  //       }
-  //   }
-    
-  //   edges.sort((a, b) => a.weight - b.weight);                        // Сортировка ребер по возрастанию
-    
-  //   const parent = {};                                                //родитель
-  //   const rank = {};                                                  //глубина дерева (станет родителем)
-    
-  //   const find = (v) => {                                             // Эта функция находит корень (или представителя) компоненты связности для узла. Если текущий узел 
-  //       if (parent[v] !== v) parent[v] = find(parent[v]);             // не является своим собственным родителем, то рекурсивно находим родителя, пока не дойдем до корня
-  //       return parent[v];                                             //
-  //   };
-    
-  //   const union = (v1, v2) => {                                       // Эта функция объединяет два множества (дерева) в одно. 
-  //       const root1 = find(v1);
-  //       const root2 = find(v2);
-  //       if (root1 !== root2) {
-  //           if (rank[root1] > rank[root2]) {
-  //               parent[root2] = root1;
-  //           } else if (rank[root1] < rank[root2]) {
-  //               parent[root1] = root2;
-  //           } else {
-  //               parent[root2] = root1;
-  //               rank[root1] += 1;
-  //           }
-  //       }
-  //   };
-    
-  //   for (const vertex in this.adjacencyList) {
-  //       parent[vertex] = vertex;
-  //       rank[vertex] = 0;
-  //   }
-    
-  //   const mst = [];                                                   // Основная функция mst
-  //   for (const { vertex1, vertex2, weight } of edges) {               // Для каждого отсортированного ребра 
-  //     if (find(vertex1) !== find(vertex2)) {                          // Проверяется, принадлежат ли вершины рёбра разным компонентам (с помощью find).
-  //         union(vertex1, vertex2);                                    // Если это так, ребро добавляется в список минимального остовного дерева (mst), и вершины соединяются (с помощью union).
-  //         mst.push({ vertex1, vertex2, weight });
-  //     }
-  //   }
-  //   return mst;
-  //   // Создаю граф
-  // };
   kruskalMST() {
-    const edges = this.toEdgeList(); // Получаем список рёбер
-    edges.sort((a, b) => a.weight - b.weight); // Сортируем по весу
+    let mstGraph = new Graph();
+    mstGraph.constructorCopy(this);
+    mstGraph.adjacencyList = {}; // Очищаем рёбра
 
-    const newGraph = new this.constructor(); // Создаём новый граф того же типа
-    const graphType = this.determineGraphType(); // Определяем тип графа
+    let edges = this.toEdgeList().sort((a, b) => a.weight - b.weight);
 
-    console.log(`Тип графа: ${graphType}`);
-
-    const parent = {};
-    const find = (vertex) => (parent[vertex] === vertex ? vertex : (parent[vertex] = find(parent[vertex])));
-    const union = (v1, v2) => (parent[find(v1)] = find(v2));
-
-    // Инициализируем вершины
-    for (const vertex in this.adjacencyList) {
-        newGraph.addVertex(vertex);
-        parent[vertex] = vertex;
+    let dsu = new DSU();
+    for (let vertex in this.adjacencyList) {
+        mstGraph.addVertex(vertex);
+        dsu.addElement(vertex);
     }
 
-    // Обход рёбер и построение минимального остовного дерева
-    for (const { from, to, weight } of edges) {
-        if (find(from) !== find(to)) {
-            union(from, to);
-            console.log(`Добавляю ребро ${from} - ${to} (вес: ${weight})`);
+    for (let { from, to, weight } of edges) {
+        if (dsu.find(from) !== dsu.find(to)) {
+            dsu.union(from, to);
+            mstGraph.adjacencyList[from].push({ node: to, weight });
+            mstGraph.adjacencyList[to].push({ node: from, weight });
+        }
+    }
+    return mstGraph;
+  }
+}
 
-            // Выбираем правильный метод добавления рёбер
-            switch (graphType) {
-                case "UndirectedUnweightedGraph":
-                    newGraph.addUndirectedEdgeNonWeight(from, to);
-                    break;
-                case "UndirectedWeightedGraph":
-                    newGraph.addUndirectedEdge(from, to, weight);
-                    break;
-                case "DirectedUnweightedGraph":
-                    newGraph.addDirectedEdgeNonWeight(from, to);
-                    break;
-                case "DirectedWeightedGraph":
-                    newGraph.addDirectedEdgeWeight(from, to, weight);
-                    break;
-                default:
-                    throw new Error("Неподдерживаемый тип графа");
+// DSU (Find-Union) для обработки компонент
+class DSU {
+    constructor() {
+        this.parent = new Map();
+        this.rank = new Map();
+    }
+
+    find(v) {
+        if (this.parent.get(v) !== v) {
+            this.parent.set(v, this.find(this.parent.get(v)));
+        }
+        return this.parent.get(v);
+    }
+
+    union(u, v) {
+        let rootU = this.find(u);
+        let rootV = this.find(v);
+        if (rootU !== rootV) {
+            let rankU = this.rank.get(rootU) || 0;
+            let rankV = this.rank.get(rootV) || 0;
+            if (rankU > rankV) {
+                this.parent.set(rootV, rootU);
+            } else if (rankU < rankV) {
+                this.parent.set(rootU, rootV);
+            } else {
+                this.parent.set(rootV, rootU);
+                this.rank.set(rootU, rankU + 1);
             }
         }
     }
 
-    // Преобразование в формат, подходящий для сохранения
-    const formattedAdjacencyList = {};
-    for (const vertex in newGraph.adjacencyList) {
-        formattedAdjacencyList[vertex] = newGraph.adjacencyList[vertex].map(edge => {
-            return {
-                node: edge.to,
-                weight: edge.weight || null // Для невзвешенных рёбер вес может быть null
-            };
-        });
+    addElement(v) {
+        if (!this.parent.has(v)) {
+            this.parent.set(v, v);
+            this.rank.set(v, 0);
+        }
     }
-
-    // Создаём объект для возвращения, который будет сохранён в файл
-    const result = {
-        adjacencyList: formattedAdjacencyList
-    };
-
-    console.log("Минимальное остовное дерево:", JSON.stringify(result.adjacencyList, null, 2));
-
-    return result; // Возвращаем результат в нужном формате
-}
 }
 
 //фабрика графов

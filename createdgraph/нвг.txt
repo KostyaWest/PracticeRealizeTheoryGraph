@@ -37,10 +37,6 @@
       "weight": 4
     },
     {
-      "node": "C",
-      "weight": 2
-    },
-    {
       "node": "F",
       "weight": 8
     }
@@ -124,7 +120,7 @@
   "J": [
     {
       "node": "I",
-      "weight": 2
+      "weight": 4
     },
     {
       "node": "K",
