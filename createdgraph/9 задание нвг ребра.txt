@@ -1,0 +1,18 @@
+{
+  "P": [
+    { "node": "Q", "weight": 2 },
+    { "node": "R", "weight": -1 }
+  ],
+  "Q": [
+    { "node": "P", "weight": 2 },
+    { "node": "S", "weight": 4 }
+  ],
+  "R": [
+    { "node": "P", "weight": -1 },
+    { "node": "S", "weight": 3 }
+  ],
+  "S": [
+    { "node": "Q", "weight": 4 },
+    { "node": "R", "weight": 3 }
+  ]
+}

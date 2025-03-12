@@ -1,0 +1,14 @@
+{
+  "X": [
+    { "node": "Y", "weight": -2 },
+    { "node": "Z", "weight": -3 }
+  ],
+  "Y": [
+    { "node": "X", "weight": -2 },
+    { "node": "Z", "weight": -1 }
+  ],
+  "Z": [
+    { "node": "X", "weight": -3 },
+    { "node": "Y", "weight": -1 }
+  ]
+}

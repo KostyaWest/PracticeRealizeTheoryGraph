@@ -1,0 +1,18 @@
+{
+  "A": [
+    { "node": "B", "weight": 4 },
+    { "node": "C", "weight": 6 }
+  ],
+  "B": [
+    { "node": "A", "weight": 4 },
+    { "node": "D", "weight": 3 }
+  ],
+  "C": [
+    { "node": "A", "weight": 6 },
+    { "node": "D", "weight": 2 }
+  ],
+  "D": [
+    { "node": "B", "weight": 3 },
+    { "node": "C", "weight": 2 }
+  ]
+}

@@ -465,9 +465,13 @@ class Graph {
     return { distance: distances[end], paths };
   }
 
-  // Девятое задание. Определить, существует ли путь длиной не более L между двумя заданными вершинами графа. Алгоритм Беллмана-Форда
+  // Девятое задание. Определить, существует ли путь длиной не более L между двумя заданными вершинами графа. Алгоритм Флойда
   // Для любого взвешенного графа
 
+  // Проверка, связаны ли две вершины (DFS)
+  // Модифицированный метод с использованием алгоритма Флойда
+
+  // Проверка, связаны ли две вершины (DFS)
   // Проверка, связаны ли две вершины (DFS)
   isConnected(start, end) {
     let visited = new Set();
@@ -479,46 +483,86 @@ class Graph {
         dfs.call(this, neighbor.node);
       }
     }
-
     dfs.call(this, start);
     return visited.has(end);
   }
 
-  // Алгоритм Беллмана-Форда для проверки пути длиной ≤ L
+  // Алгоритм Флойда для проверки пути длиной ≤ L
   hasPathWithinLimit(start, end, L) {
-    let distances = {};
     let vertices = Object.keys(this.adjacencyList);
+    let dist = {};
+    let next = {}; // Для восстановления пути
 
+    // Инициализация матриц
     for (let vertex of vertices) {
-      distances[vertex] = Infinity;
-    }
-    distances[start] = 0;
-
-    for (let i = 1; i < vertices.length; i++) {
-      for (let vertex in this.adjacencyList) {
-        for (let neighbor of this.adjacencyList[vertex]) {
-          let newDist = distances[vertex] + neighbor.weight;
-          if (newDist < distances[neighbor.node]) {
-            distances[neighbor.node] = newDist;
-          }
+        dist[vertex] = {};
+        next[vertex] = {};
+        for (let v of vertices) {
+            dist[vertex][v] = vertex === v ? 0 : Infinity;
+            next[vertex][v] = null;
         }
-      }
     }
-    // Проверка на циклы отрицательного веса
+
+    // Заполняем начальные расстояния и предшественников
     for (let vertex in this.adjacencyList) {
-      for (let neighbor of this.adjacencyList[vertex]) {
-          let newDist = distances[vertex] + neighbor.weight;
-          if (newDist < distances[neighbor.node]) {
-              console.log("Граф содержит цикл отрицательного веса!");
-              return false;
-          }
+        for (let neighbor of this.adjacencyList[vertex]) {
+            dist[vertex][neighbor.node] = neighbor.weight;
+            next[vertex][neighbor.node] = neighbor.node; // Прямой путь
+        }
+    }
+
+    // Алгоритм Флойда с заполнением предшественников
+    for (let vertexK of vertices) {
+        for (let vertexI of vertices) {
+            for (let vertexJ of vertices) {
+                if (dist[vertexI][vertexK] !== Infinity && dist[vertexK][vertexJ] !== Infinity) {
+                    let newDist = dist[vertexI][vertexK] + dist[vertexK][vertexJ];
+                    if (dist[vertexI][vertexJ] > newDist) {
+                        dist[vertexI][vertexJ] = newDist;
+                        next[vertexI][vertexJ] = next[vertexI][vertexK]; // Обновляем путь
+                    }
+                }
+            }
+        }
+    }
+
+    // Проверка отрицательных циклов
+    for (let vertex of vertices) {
+        if (dist[vertex][vertex] < 0) {
+            console.log("Ошибка: Граф содержит отрицательный цикл!");
+            return false;
+        }
+    }
+
+    // Восстановление пути
+    function getPath(u, v) {
+        if (next[u][v] === null) return null; // Нет пути
+        let path = [u];
+        while (u !== v) {
+            if (next[u][v] === null) return null; // Проверка на ошибку
+            u = next[u][v];
+            path.push(u);
+        }
+        return path;
       }
-  }
-  if (distances[end] === Infinity) return false;
-  return distances[end] <= L;
+
+      // Проверка пути между start и end
+      if (start === end) return { exists: true, path: [start], distance: 0 };
+      if (dist[start][end] === Infinity || next[start][end] === null) {
+          return { exists: false, path: null, distance: Infinity };
+      }
+      if (dist[start][end] > L) {
+          return { exists: false, path: null, distance: dist[start][end] };
+      }
+
+      let path = getPath(start, end);
+      if (!path) {
+          return { exists: false, path: null, distance: dist[start][end] };
+      }
+
+      return { exists: true, path, distance: dist[start][end] };
   }
 }
-
 
 // DSU (Find-Union) для обработки компонент. Седьмое задание
 
