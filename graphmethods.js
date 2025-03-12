@@ -392,41 +392,133 @@ class Graph {
     return mstGraph;
   }
 
-// Восьмое задание Найти количество кратчайших путей от u до каждой вершины. Алгоритм Дейкстры. Только для взвешенного орграфа
-dijkstra(start) {
-  let distances = {};                                                     // хранения кратчайших расстояний от начальной вершины до каждой вершины.
-  let previous = {};                                                      // хранения информации о предыдущей вершине на пути к каждой вершине (нужно для восстановления пути).
-  let queue = new Map();                                                  // очередь с приоритетом для обработки вершин, где ключ — вершина, а значение — её расстояние от начальной.
+  //  Восьмое задание Найти длину кратчайшего пути из u в v и вывести все пути такой длины. Алгоритм Дейкстры. Только для взвешенных графов
 
-  // Заполнение начальных значений
-  for (let vertex in this.adjacencyList) {
-      distances[vertex] = Infinity;                                        // Расстояние - бесконечность
-      previous[vertex] = null;                                             // Информация неопределена
-      queue.set(vertex, Infinity);                                         // Устанавливаем все вершины с расстоянием Infinity, но для начальной вершины start расстояние будет 0.
+  // Теоретическая информация (Алгоритм Дейкстры):
+  // Алгоритм:
+  // 1. Инициализация:
+  //    Назначаем начальной вершине расстояние 0, а всем остальным вершинам — бесконечность (или очень большое число).
+  //    Все вершины, кроме начальной, считаются недосягаемыми.
+  // 2. Посещение вершины:
+  //    Выбираем вершину с минимальным расстоянием среди всех ещё не посещённых вершин (изначально это начальная вершина).
+  //    После выбора вершины помечаем её как посещённую, и она больше не участвует в вычислениях.
+  // 3. Обновление расстояний:
+  //    Для каждой смежной вершины (соседей) проверяем, можно ли улучшить расстояние до неё через текущую вершину. Если через текущую вершину путь короче, чем уже найденный, обновляем расстояние.
+  // 4. Повторение:   
+  //    Повторяем шаги 2 и 3 до тех пор, пока не посетим все вершины или пока не окажется, что все оставшиеся вершины недостижимы.
+  // 5. Завершение:
+  //    После того как все вершины обработаны, в массиве расстояний будут храниться минимальные расстояния от начальной вершины до всех остальных вершин графа.
+
+
+  dijkstra(start, end) {
+    let distances = {};  // хранения кратчайших расстояний от начальной вершины до каждой вершины
+    let previous = {};   // хранения информации о предыдущих вершинах на пути к каждой вершине
+    let queue = new Map();  // очередь с приоритетом для обработки вершин
+
+    // Заполнение начальных значений
+    for (let vertex in this.adjacencyList) {
+        distances[vertex] = Infinity;  // Расстояние - бесконечность
+        previous[vertex] = [];         // Здесь будет храниться список предков
+        queue.set(vertex, Infinity);   // Устанавливаем все вершины с расстоянием Infinity
+    }
+    distances[start] = 0;
+    queue.set(start, 0);
+
+
+
+    // Основной цикл работы алгоритма
+    while (queue.size > 0) {
+        // Выбираем вершину с минимальным расстоянием
+        let [current] = [...queue.entries()].sort((a, b) => a[1] - b[1])[0];   // выбирается вершина с минимальным расстоянием, то есть вершина, для которой кратчайший путь уже найден.
+                                                                              // сортировка по значениям (расстояниям).
+        queue.delete(current);
+
+        // Обработка соседей текущей вершины
+        for (let neighbor of this.adjacencyList[current]) {                 // Для каждого соседа текущей вершины (current) вычисляется альтернативное расстояние alt, которое равно:
+            let alt = distances[current] + neighbor.weight;                 // расстояние до текущей вершины (distances[current]) + вес рёбра от текущей вершины до соседа (neighbor.weight).
+            if (alt < distances[neighbor.node]) {                           // Если это альтернативное расстояние меньше, чем уже сохранённое для соседа, обновляем
+                distances[neighbor.node] = alt;                             // distances[neighbor.node] — с новым минимальным расстоянием.
+                previous[neighbor.node] = [current];                        // previous[neighbor.node] — с информацией о том, что из вершины current можно дойти до соседа.
+                queue.set(neighbor.node, alt);
+            } else if (alt === distances[neighbor.node]) {                  // Добавляем соседа в очередь с новым расстоянием.
+                previous[neighbor.node].push(current);                      // Добавляем альтернативного предка
+            }
+      }
+    }
+    // Восстановление всех путей
+    function findPaths(node) {
+        if (node === start) return [[start]];  // Базовый случай: путь до стартовой вершины
+        let paths = [];
+        for (let predecessor of previous[node]) {
+            let subPaths = findPaths(predecessor);
+            for (let path of subPaths) {
+                paths.push(path.concat(node));
+            }
+        }
+        return paths;
+    }
+
+    // Получаем все пути от start до end
+    let paths = findPaths(end);
+
+    // Возвращаем кратчайшее расстояние и все пути
+    return { distance: distances[end], paths };
   }
-  distances[start] = 0;
-  queue.set(start, 0);
 
-  // Основной цикл работы алгоритма
-  while (queue.size > 0) {
-      let [current] = [...queue.entries()].sort((a, b) => a[1] - b[1]);   // выбирается вершина с минимальным расстоянием, то есть вершина, для которой кратчайший путь уже найден.
-                                                                          // сортировка по значениям (расстояниям).
-      queue.delete(current);                                              
+  // Девятое задание. Определить, существует ли путь длиной не более L между двумя заданными вершинами графа. Алгоритм Беллмана-Форда
+  // Для любого взвешенного графа
 
-      // Обработка соседей текущей вершины
-      for (let neighbor of this.adjacencyList[current]) {                 // Для каждого соседа текущей вершины (current) вычисляется альтернативное расстояние alt, которое равно:
-          let alt = distances[current] + neighbor.weight;                 // расстояние до текущей вершины (distances[current]) + вес рёбра от текущей вершины до соседа (neighbor.weight).
-          if (alt < distances[neighbor.node]) {                           // Если это альтернативное расстояние меньше, чем уже сохранённое для соседа, обновляем
-              distances[neighbor.node] = alt;                             // distances[neighbor.node] — с новым минимальным расстоянием.
-              previous[neighbor.node] = current;                          // previous[neighbor.node] — с информацией о том, что из вершины current можно дойти до соседа.
-              queue.set(neighbor.node, alt);                              // Добавляем соседа в очередь с новым расстоянием.
+  // Проверка, связаны ли две вершины (DFS)
+  isConnected(start, end) {
+    let visited = new Set();
+
+    function dfs(node) {
+      if (visited.has(node)) return;
+      visited.add(node);
+      for (let neighbor of (this.adjacencyList[node] || [])) {
+        dfs.call(this, neighbor.node);
+      }
+    }
+
+    dfs.call(this, start);
+    return visited.has(end);
+  }
+
+  // Алгоритм Беллмана-Форда для проверки пути длиной ≤ L
+  hasPathWithinLimit(start, end, L) {
+    let distances = {};
+    let vertices = Object.keys(this.adjacencyList);
+
+    for (let vertex of vertices) {
+      distances[vertex] = Infinity;
+    }
+    distances[start] = 0;
+
+    for (let i = 1; i < vertices.length; i++) {
+      for (let vertex in this.adjacencyList) {
+        for (let neighbor of this.adjacencyList[vertex]) {
+          let newDist = distances[vertex] + neighbor.weight;
+          if (newDist < distances[neighbor.node]) {
+            distances[neighbor.node] = newDist;
+          }
+        }
+      }
+    }
+    // Проверка на циклы отрицательного веса
+    for (let vertex in this.adjacencyList) {
+      for (let neighbor of this.adjacencyList[vertex]) {
+          let newDist = distances[vertex] + neighbor.weight;
+          if (newDist < distances[neighbor.node]) {
+              console.log("Граф содержит цикл отрицательного веса!");
+              return false;
           }
       }
   }
+  if (distances[end] === Infinity) return false;
+  return distances[end] <= L;
+  }
+}
 
-  return { distances, previous };
-}
-}
 
 // DSU (Find-Union) для обработки компонент. Седьмое задание
 

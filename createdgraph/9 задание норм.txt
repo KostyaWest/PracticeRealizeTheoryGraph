@@ -1,0 +1,6 @@
+{
+  "A": [{"node": "B", "weight": 4}, {"node": "C", "weight": 1}],
+  "B": [{"node": "C", "weight": 2}, {"node": "D", "weight": 5}],
+  "C": [{"node": "D", "weight": 8}],
+  "D": []
+}

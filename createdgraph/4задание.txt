@@ -1,8 +1,0 @@
-{
-  "A": [{"node": "B", "weight": 3}, {"node": "C", "weight": 1}],
-  "B": [{"node": "D", "weight": 4}],
-  "C": [{"node": "D", "weight": 2}],
-  "D": [{"node": "E", "weight": 5}],
-  "E": [{"node": "A", "weight": 6}, {"node": "E", "weight": 1}],
-  "F": []
-}

@@ -258,6 +258,8 @@ function zadaniya(graph) {
     console.log("4. задание 5, номер 7. Вывести корень ацикличного орграфа. Только для ориентированых графов");
     console.log("5. задание 6, номер 1. Найти все вершины орграфа, из которых существует путь в данную. Только для ориентированых графов");
     console.log("6. задание 7, Алгоритм Краскала. Только для неориентированых взвешанных графов");
+    console.log("7. задание 8, номер 21. Алгоритм Дейкстры. Для любых взвешанных графов");
+    console.log("8. задание 9, номер 1. Алгоритм Беллмана - Форда. Для любых взвешанных графов");
     
     console.log("9. Вернуться в редактор графа");
     console.log("10. Завершить редактирование");
@@ -358,38 +360,91 @@ function zadaniya(graph) {
                 }
                 break;
                 case "7":
-                    if (graph.constructor.name !== "DirectedWeightedGraph") {
-                        console.log("Ошибка: Алгоритм Дейкстры применяется только для ориентированных взвешенных графов.");
-                        zadaniya(graph);
-                        return;
-                    }
-                
-                    // Проверяем, есть ли отрицательные рёбра
-                    if (graph.toEdgeList().some(edge => edge.weight < 0)) {
-                        console.log("Ошибка: Алгоритм Дейкстры не работает с отрицательными рёбрами!");
-                        zadaniya(graph);
-                        return;
-                    }
-                
-                    rl.question("Введите начальную вершину: ", (start) => {
-                        if (!(start in graph.adjacencyList)) {
-                            console.log("Ошибка: Вершина не найдена!");
-                            zadaniya(graph);
-                            return;
-                        }
-                
-                        let result = graph.dijkstra(start);
-                        console.log("\nКратчайшие расстояния от", start, ":");
-                        for (let vertex in result.distances) {
-                            console.log(`${start} -> ${vertex}: ${result.distances[vertex]}`);
-                        }
-                        zadaniya(graph);
-                    });
-                    break;
-                case "8":
-                    console.log("пусто");
+                // Проверяем, является ли граф взвешенным
+                if (!graph.constructor.name.includes("Weighted")) {
+                    console.log("Ошибка: Алгоритм Дейкстры применяется только для взвешенных графов.");
                     zadaniya(graph);
-                    break;
+                    return;
+                }
+
+                // Проверяем, есть ли отрицательные рёбра
+                if (graph.toEdgeList().some(edge => edge.weight < 0)) {
+                    console.log("Ошибка: Алгоритм Дейкстры не работает с отрицательными рёбрами!");
+                    zadaniya(graph);
+                    return;
+                }
+
+                rl.question("Введите начальную вершину и конечную вершину: ", (input) => {
+                    // Разделяем ввод на start и end
+                    let [start, end] = input.split(" ");
+
+                    // Проверяем, существуют ли обе вершины в графе
+                    if (!(start in graph.adjacencyList) || !(end in graph.adjacencyList)) {
+                        console.log("Ошибка: Вершина не найдена!");
+                        zadaniya(graph);
+                        return;
+                    }
+
+                    // Запуск алгоритма Дейкстры для нахождения кратчайших путей
+                    let result = graph.dijkstra(start, end);
+
+                    // Выводим кратчайшее расстояние
+                    console.log("\nКратчайшее расстояние от", start, "до", end, ":", result.distance);
+
+                    // Если расстояние до конечной вершины бесконечность, то пути нет
+                    if (result.distance === Infinity) {
+                        console.log("Нет пути от", start, "до", end);
+                    } else {
+                        // Выводим все кратчайшие пути
+                        console.log("Все кратчайшие пути от", start, "до", end, ":");
+                        result.paths.forEach((path, index) => {
+                            console.log(`Путь ${index + 1}: ${path.join(' -> ')}`);
+                        });
+                    }
+
+                    zadaniya(graph);
+                });
+                break;
+                case "8":
+                rl.question("Введите начальную, конечную вершину и L через пробел: ", (input) => {
+                    const [start, end, L] = input.split(" ");
+                    if (!(start in graph.adjacencyList) || !(end in graph.adjacencyList)) {
+                        console.log("Ошибка: Одна или обе вершины не найдены!");
+                        zadaniya(graph);
+                        return;
+                    }
+                    if (L < 0) {
+                        console.log("Ошибка: Длина пути L не может быть отрицательной!");
+                        zadaniya(graph);
+                        return;
+                    }
+
+                    let exists = graph.hasPathWithinLimit(start, end, parseInt(L));
+
+                    if (exists === false) {
+                        console.log("Ошибка: Граф содержит цикл отрицательного веса. Алгоритм не может дать корректный результат.");
+                    }
+                    // Проверяем, взвешенный ли граф
+                    if (!graph.constructor.name.includes("Weighted")) {
+                        console.log("Ошибка: Задание применимо только для взвешенных графов.");
+                        zadaniya(graph);
+                        return;
+                    }
+
+                    // Проверяем, связаны ли вершины (обходом в глубину DFS)
+                    if (!graph.isConnected(start, end)) {
+                        console.log(`Вершины ${start} и ${end} не связаны. Путь невозможен.`);
+                        zadaniya(graph);
+                        return;
+                    }
+                    if (graph.hasPathWithinLimit(start, end, parseInt(L))) {
+                        console.log(`Существует путь между ${start} и ${end} длиной не более ${L}.`);
+                    } else {
+                        console.log(`Пути между ${start} и ${end} длиной ≤ ${L} не найдено.`);
+                    }
+                    zadaniya(graph);
+                });
+                break;
                 case "9":
                     console.log("Возвращаемся в редактор графа...");
                     editGraphMenu(graph);

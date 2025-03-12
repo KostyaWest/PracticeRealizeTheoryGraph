@@ -1,4 +1,0 @@
-{
-  "A": [{ "node": "B", "weight": 2 }, { "node": "B", "weight": 2 }],
-  "B": [{ "node": "A", "weight": 2 }]
-}
