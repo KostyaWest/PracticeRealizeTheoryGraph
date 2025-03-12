@@ -362,56 +362,64 @@ class Graph {
   // Это делается, когда два элемента принадлежат разным множествам, и нужно объединить их в одно множество.
   // Каждый элемент хранит ссылку на роодителя и сам является предком
   // При объединии двух множеств, один из корней становится родителем другого. Чтобы сохранить структуру сбалансированной и ускорить операции, используют ранги (или глубину деревьев).
+  
   kruskalMST() {
     let mstGraph = new Graph();
+
+    // Создается копия графа и в ней отчищаются все ребра 
+
     mstGraph.constructorCopy(this);
-    mstGraph.adjacencyList = {}; // Очищаем рёбра
+    mstGraph.adjacencyList = {};                                       // Очищаем рёбра
 
-    let edges = this.toEdgeList().sort((a, b) => a.weight - b.weight);
+  
+    let edges = this.toEdgeList().sort((a, b) => a.weight - b.weight); // преобразует граф в массив рёбер и сортирует рёбра по весу.
 
+    // Инициализация DSU
     let dsu = new DSU();
     for (let vertex in this.adjacencyList) {
         mstGraph.addVertex(vertex);
-        dsu.addElement(vertex);
+        dsu.addElement(vertex);                                       // Каждая вершина добавляется в dsu
     }
 
+    // Добавление ребер в MST по Краскалу
     for (let { from, to, weight } of edges) {
-        if (dsu.find(from) !== dsu.find(to)) {
-            dsu.union(from, to);
-            mstGraph.adjacencyList[from].push({ node: to, weight });
-            mstGraph.adjacencyList[to].push({ node: from, weight });
+        if (dsu.find(from) !== dsu.find(to)) {                        //Перебираем рёбра в порядке возрастания веса
+            dsu.union(from, to);                                      //Если вершины from и to принадлежат разным компонентам
+            mstGraph.adjacencyList[from].push({ node: to, weight });  // Объединяет их в одну компоненту
+            mstGraph.adjacencyList[to].push({ node: from, weight });  // Добавляет это ребро в mstGraph
         }
     }
     return mstGraph;
   }
 
-// Восьмое задание Найти количество кратчайших путей от u до каждой вершины. Алгоритм Дейкстры
+// Восьмое задание Найти количество кратчайших путей от u до каждой вершины. Алгоритм Дейкстры. Только для взвешенного орграфа
 dijkstra(start) {
-  let distances = {};
-  let previous = {};
-  let queue = new Map();
+  let distances = {};                                                     // хранения кратчайших расстояний от начальной вершины до каждой вершины.
+  let previous = {};                                                      // хранения информации о предыдущей вершине на пути к каждой вершине (нужно для восстановления пути).
+  let queue = new Map();                                                  // очередь с приоритетом для обработки вершин, где ключ — вершина, а значение — её расстояние от начальной.
 
-  // Инициализация
+  // Заполнение начальных значений
   for (let vertex in this.adjacencyList) {
-      distances[vertex] = Infinity;
-      previous[vertex] = null;
-      queue.set(vertex, Infinity);
+      distances[vertex] = Infinity;                                        // Расстояние - бесконечность
+      previous[vertex] = null;                                             // Информация неопределена
+      queue.set(vertex, Infinity);                                         // Устанавливаем все вершины с расстоянием Infinity, но для начальной вершины start расстояние будет 0.
   }
   distances[start] = 0;
   queue.set(start, 0);
 
+  // Основной цикл работы алгоритма
   while (queue.size > 0) {
-      // Выбираем вершину с минимальным расстоянием
-      let [current] = [...queue.entries()].sort((a, b) => a[1] - b[1]);
-      queue.delete(current);
+      let [current] = [...queue.entries()].sort((a, b) => a[1] - b[1]);   // выбирается вершина с минимальным расстоянием, то есть вершина, для которой кратчайший путь уже найден.
+                                                                          // сортировка по значениям (расстояниям).
+      queue.delete(current);                                              
 
-      // Перебираем соседей
-      for (let neighbor of this.adjacencyList[current]) {
-          let alt = distances[current] + neighbor.weight;
-          if (alt < distances[neighbor.node]) {
-              distances[neighbor.node] = alt;
-              previous[neighbor.node] = current;
-              queue.set(neighbor.node, alt);
+      // Обработка соседей текущей вершины
+      for (let neighbor of this.adjacencyList[current]) {                 // Для каждого соседа текущей вершины (current) вычисляется альтернативное расстояние alt, которое равно:
+          let alt = distances[current] + neighbor.weight;                 // расстояние до текущей вершины (distances[current]) + вес рёбра от текущей вершины до соседа (neighbor.weight).
+          if (alt < distances[neighbor.node]) {                           // Если это альтернативное расстояние меньше, чем уже сохранённое для соседа, обновляем
+              distances[neighbor.node] = alt;                             // distances[neighbor.node] — с новым минимальным расстоянием.
+              previous[neighbor.node] = current;                          // previous[neighbor.node] — с информацией о том, что из вершины current можно дойти до соседа.
+              queue.set(neighbor.node, alt);                              // Добавляем соседа в очередь с новым расстоянием.
           }
       }
   }
@@ -420,41 +428,45 @@ dijkstra(start) {
 }
 }
 
-// DSU (Find-Union) для обработки компонент
+// DSU (Find-Union) для обработки компонент. Седьмое задание
+
+// Теор информация:
+// Map — это коллекция, похожая на объект, но с ключами любого типа и упорядоченным хранением.
 class DSU {
     constructor() {
-        this.parent = new Map();
-        this.rank = new Map();
+        this.parent = new Map();                                // Коллекция с родителем
+        this.rank = new Map();                                  // коллекция rank
     }
 
+   // поиск корня множества
     find(v) {
         if (this.parent.get(v) !== v) {
-            this.parent.set(v, this.find(this.parent.get(v)));
+            this.parent.set(v, this.find(this.parent.get(v)));  // Рекурсивно ищет корневой элемент множества, к которому принадлежит v и сразу обновляет parent(v) чтобы напрямую указывать на корень.
         }
-        return this.parent.get(v);
+        return this.parent.get(v);                             
     }
 
     union(u, v) {
-        let rootU = this.find(u);
+        let rootU = this.find(u);                               // Находит корни u и v с помощью find(u) и find(v)
         let rootV = this.find(v);
         if (rootU !== rootV) {
             let rankU = this.rank.get(rootU) || 0;
             let rankV = this.rank.get(rootV) || 0;
             if (rankU > rankV) {
-                this.parent.set(rootV, rootU);
+                this.parent.set(rootV, rootU);                  // rootV присоединяем к rootU
             } else if (rankU < rankV) {
-                this.parent.set(rootU, rootV);
+                this.parent.set(rootU, rootV);                  // rootU присоединяем к rootV
             } else {
-                this.parent.set(rootV, rootU);
-                this.rank.set(rootU, rankU + 1);
+                this.parent.set(rootV, rootU);                  // Если ранги равны, присоединяем rootV к rootU
+                this.rank.set(rootU, rankU + 1);                // Увеличиваем ранг rootU
             }
         }
     }
 
     addElement(v) {
-        if (!this.parent.has(v)) {
-            this.parent.set(v, v);
-            this.rank.set(v, 0);
+        if (!this.parent.has(v)) {                              // Проверяем, есть ли элемент в структуре
+            this.parent.set(v, v);                              // Делаем его своим родителем (он сам себе множество)
+            this.rank.set(v, 0);                                // Устанавливаем начальный ранг 0
         }
     }
 }
